@@ -1,9 +1,18 @@
 [package]
-name = "web-extension"
+name = "web-extensions-sys"
 version = "0.1.0"
-authors = ["Pauan <pcxunlimited@gmail.com>"]
+authors = ["Roman Volosatovs <rvolosatovs@riseup.net>", "Pauan <pcxunlimited@gmail.com>"]
 edition = "2018"
+description = "This crate provides WebExtension API WASM bindings"
+repository = "https://github.com/rvolosatovs/web-extensions-sys"
+license = "MIT"
+keywords = ["api", "ffi", "wasm", "web", "webassembly"]
+categories = ["external-ffi-bindings", "wasm"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wasm-bindgen = "0.2.45"
-js-sys = "0.3.27"
+js-sys = "0.3.44"
+wasm-bindgen-futures = "0.4.17"
+wasm-bindgen = "0.2.67"
