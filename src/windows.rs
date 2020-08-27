@@ -1,7 +1,6 @@
-use wasm_bindgen::prelude::*;
-use js_sys::{Array, Object, Promise};
 use crate::Event;
-
+use js_sys::{Array, Object, Promise};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -52,7 +51,6 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = type)]
     pub fn type_(this: &Window) -> Option<String>;
 }
-
 
 #[wasm_bindgen]
 extern "C" {

@@ -1,9 +1,8 @@
-use wasm_bindgen::prelude::*;
-use js_sys::{Object, Promise};
-use crate::Event;
 use crate::tabs::Tab;
 use crate::windows::Window;
-
+use crate::Event;
+use js_sys::{Object, Promise};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -19,7 +18,6 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn window(this: &Session) -> Option<Window>;
 }
-
 
 #[wasm_bindgen]
 extern "C" {
@@ -54,7 +52,8 @@ extern "C" {
     pub fn get_window_value(this: &Sessions, window_id: i32, key: &str) -> Promise;
 
     #[wasm_bindgen(method, js_name = setWindowValue)]
-    pub fn set_window_value(this: &Sessions, window_id: i32, key: &str, value: &JsValue) -> Promise;
+    pub fn set_window_value(this: &Sessions, window_id: i32, key: &str, value: &JsValue)
+        -> Promise;
 
     #[wasm_bindgen(method, js_name = removeWindowValue)]
     pub fn remove_window_value(this: &Sessions, window_id: i32, key: &str) -> Promise;

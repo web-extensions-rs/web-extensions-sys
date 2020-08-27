@@ -1,5 +1,5 @@
-use wasm_bindgen::prelude::*;
 use js_sys::Function;
+use wasm_bindgen::prelude::*;
 
 mod downloads;
 pub use downloads::*;
@@ -27,7 +27,6 @@ pub use runtime::*;
 
 mod port;
 pub use port::*;
-
 
 #[wasm_bindgen]
 extern "C" {
@@ -60,7 +59,6 @@ extern "C" {
     pub fn sessions(this: &Browser) -> Sessions;
 }
 
-
 // TODO getRules, removeRules, and addRules
 #[wasm_bindgen]
 extern "C" {
@@ -78,7 +76,6 @@ extern "C" {
     #[wasm_bindgen(method, js_name = hasListeners)]
     pub fn has_listeners(this: &Event) -> bool;
 }
-
 
 pub mod traits {
     pub use crate::storage::{StorageAreaRead, StorageAreaWrite};

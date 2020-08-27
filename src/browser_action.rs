@@ -1,6 +1,5 @@
-use wasm_bindgen::prelude::*;
 use crate::Event;
-
+use wasm_bindgen::prelude::*;
 
 // TODO
 #[wasm_bindgen]

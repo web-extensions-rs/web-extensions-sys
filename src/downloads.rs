@@ -1,6 +1,5 @@
-use wasm_bindgen::prelude::*;
 use js_sys::{Object, Promise};
-
+use wasm_bindgen::prelude::*;
 
 // TODO other methods
 #[wasm_bindgen]

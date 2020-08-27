@@ -1,6 +1,5 @@
-use wasm_bindgen::prelude::*;
 use crate::{Event, Tab};
-
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -23,7 +22,6 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = tlsChannelId)]
     pub fn tls_channel_id(this: &MessageSender) -> Option<String>;
 }
-
 
 #[wasm_bindgen]
 extern "C" {

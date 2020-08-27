@@ -1,7 +1,6 @@
-use wasm_bindgen::prelude::*;
-use js_sys::{Object, Promise};
 use crate::{Event, Port};
-
+use js_sys::{Object, Promise};
+use wasm_bindgen::prelude::*;
 
 // TODO
 #[wasm_bindgen]
@@ -9,7 +8,12 @@ extern "C" {
     pub type Runtime;
 
     #[wasm_bindgen(method, js_name = sendMessage)]
-    pub fn send_message(this: &Runtime, extension_id: Option<&str>, message: &JsValue, options: Option<&Object>) -> Promise;
+    pub fn send_message(
+        this: &Runtime,
+        extension_id: Option<&str>,
+        message: &JsValue,
+        options: Option<&Object>,
+    ) -> Promise;
 
     #[wasm_bindgen(method)]
     pub fn connect(this: &Runtime, extension_id: Option<&str>, connect_info: &Object) -> Port;

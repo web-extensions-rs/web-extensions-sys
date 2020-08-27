@@ -1,7 +1,6 @@
-use wasm_bindgen::prelude::*;
-use js_sys::{Object, Promise};
 use crate::Event;
-
+use js_sys::{Object, Promise};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -18,7 +17,6 @@ extern "C" {
     pub fn window_id(this: &TabActiveInfo) -> i32;
 }
 
-
 #[wasm_bindgen]
 extern "C" {
     #[derive(Debug)]
@@ -31,7 +29,6 @@ extern "C" {
     pub fn old_position(this: &TabDetachInfo) -> u32;
 }
 
-
 #[wasm_bindgen]
 extern "C" {
     #[derive(Debug)]
@@ -43,7 +40,6 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = newPosition)]
     pub fn new_position(this: &TabAttachInfo) -> u32;
 }
-
 
 #[wasm_bindgen]
 extern "C" {
@@ -60,7 +56,6 @@ extern "C" {
     pub fn to_index(this: &TabMoveInfo) -> u32;
 }
 
-
 #[wasm_bindgen]
 extern "C" {
     #[derive(Debug)]
@@ -72,7 +67,6 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = isWindowClosing)]
     pub fn is_window_closing(this: &TabRemoveInfo) -> bool;
 }
-
 
 #[wasm_bindgen]
 extern "C" {
@@ -88,7 +82,6 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn reason(this: &TabMutedInfo) -> Option<String>;
 }
-
 
 #[wasm_bindgen]
 extern "C" {
@@ -179,7 +172,6 @@ extern "C" {
     pub fn window_id(this: &Tab) -> i32;
 }
 
-
 #[wasm_bindgen]
 extern "C" {
     pub type Tabs;
@@ -191,7 +183,11 @@ extern "C" {
     pub fn capture_tab(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Promise;
 
     #[wasm_bindgen(method, js_name = captureVisibleTab)]
-    pub fn capture_visible_tab(this: &Tabs, window_id: Option<i32>, info: Option<&Object>) -> Promise;
+    pub fn capture_visible_tab(
+        this: &Tabs,
+        window_id: Option<i32>,
+        info: Option<&Object>,
+    ) -> Promise;
 
     #[wasm_bindgen(method)]
     pub fn connect(this: &Tabs, tab_id: i32, info: Option<&Object>) -> Promise;
@@ -233,7 +229,12 @@ extern "C" {
     pub fn move_(this: &Tabs, tab_ids: &JsValue, info: &Object) -> Promise;
 
     #[wasm_bindgen(method, js_name = moveInSuccession)]
-    pub fn move_in_succession(this: &Tabs, tab_ids: &JsValue, tab_id: Option<i32>, info: Option<&Object>) -> Promise;
+    pub fn move_in_succession(
+        this: &Tabs,
+        tab_ids: &JsValue,
+        tab_id: Option<i32>,
+        info: Option<&Object>,
+    ) -> Promise;
 
     #[wasm_bindgen(method)]
     pub fn print(this: &Tabs);
@@ -257,7 +258,12 @@ extern "C" {
     pub fn save_as_pdf(this: &Tabs, info: &Object) -> Promise;
 
     #[wasm_bindgen(method, js_name = sendMessage)]
-    pub fn send_message(this: &Tabs, tab_id: i32, message: &JsValue, info: Option<&Object>) -> Promise;
+    pub fn send_message(
+        this: &Tabs,
+        tab_id: i32,
+        message: &JsValue,
+        info: Option<&Object>,
+    ) -> Promise;
 
     #[wasm_bindgen(method, js_name = setZoom)]
     pub fn set_zoom(this: &Tabs, tab_id: Option<i32>, zoom_factor: f64) -> Promise;
