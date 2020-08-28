@@ -59,7 +59,6 @@ extern "C" {
     pub fn sessions(this: &Browser) -> Sessions;
 }
 
-// TODO getRules, removeRules, and addRules
 #[wasm_bindgen]
 extern "C" {
     pub type Event;
@@ -72,9 +71,6 @@ extern "C" {
 
     #[wasm_bindgen(method, js_name = hasListener)]
     pub fn has_listener(this: &Event, callback: &Function) -> bool;
-
-    #[wasm_bindgen(method, js_name = hasListeners)]
-    pub fn has_listeners(this: &Event) -> bool;
 }
 
 pub mod traits {
