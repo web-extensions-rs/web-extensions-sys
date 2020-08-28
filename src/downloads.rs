@@ -2,6 +2,7 @@ use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 // TODO other methods
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type Downloads;

@@ -172,6 +172,7 @@ extern "C" {
     pub fn window_id(this: &Tab) -> i32;
 }
 
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type Tabs;

@@ -19,6 +19,7 @@ extern "C" {
     pub fn window(this: &Session) -> Option<Window>;
 }
 
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type Sessions;

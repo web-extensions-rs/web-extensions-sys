@@ -2,6 +2,7 @@ use crate::Event;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type StorageAreaRead;
@@ -13,6 +14,7 @@ extern "C" {
     pub async fn get(this: &StorageAreaRead, keys: &JsValue) -> Result<JsValue, JsValue>;
 }
 
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(extends = StorageAreaRead)]

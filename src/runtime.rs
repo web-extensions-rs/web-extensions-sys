@@ -3,6 +3,7 @@ use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 // TODO
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type Runtime;

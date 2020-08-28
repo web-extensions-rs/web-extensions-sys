@@ -52,6 +52,7 @@ extern "C" {
     pub fn type_(this: &Window) -> Option<String>;
 }
 
+#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type Windows;
