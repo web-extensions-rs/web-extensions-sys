@@ -2,6 +2,7 @@ use js_sys::Function;
 use wasm_bindgen::prelude::*;
 
 mod browser_action;
+mod contextual_identities;
 mod downloads;
 mod port;
 mod runtime;
@@ -12,6 +13,7 @@ mod tabs;
 mod windows;
 
 pub use browser_action::*;
+pub use contextual_identities::*;
 pub use downloads::*;
 pub use port::*;
 pub use runtime::*;
@@ -33,6 +35,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter, js_name = browserAction)]
     pub fn browser_action(this: &Browser) -> BrowserAction;
+
+    #[wasm_bindgen(method, getter, js_name = contextualIdentities)]
+    pub fn contextual_identities(this: &Browser) -> ContextualIdentities;
 
     #[wasm_bindgen(method, getter)]
     pub fn downloads(this: &Browser) -> Downloads;
