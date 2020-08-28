@@ -1,32 +1,29 @@
 use js_sys::Function;
 use wasm_bindgen::prelude::*;
 
+mod browser_action;
 mod downloads;
-pub use downloads::*;
-
+mod port;
+mod runtime;
+mod sessions;
+mod sidebar_action;
 mod storage;
-pub use storage::*;
-
 mod tabs;
-pub use tabs::*;
-
 mod windows;
+
+pub use browser_action::*;
+pub use downloads::*;
+pub use port::*;
+pub use runtime::*;
+pub use sessions::*;
+pub use sidebar_action::*;
+pub use storage::*;
+pub use tabs::*;
 pub use windows::*;
 
-mod sessions;
-pub use sessions::*;
-
-mod sidebar_action;
-pub use sidebar_action::*;
-
-mod browser_action;
-pub use browser_action::*;
-
-mod runtime;
-pub use runtime::*;
-
-mod port;
-pub use port::*;
+pub mod traits {
+    pub use crate::storage::{StorageAreaRead, StorageAreaWrite};
+}
 
 #[wasm_bindgen]
 extern "C" {
@@ -34,29 +31,29 @@ extern "C" {
 
     pub static browser: Browser;
 
-    #[wasm_bindgen(method, getter)]
-    pub fn downloads(this: &Browser) -> Downloads;
-
-    #[wasm_bindgen(method, getter, js_name = sidebarAction)]
-    pub fn sidebar_action(this: &Browser) -> SidebarAction;
-
     #[wasm_bindgen(method, getter, js_name = browserAction)]
     pub fn browser_action(this: &Browser) -> BrowserAction;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn downloads(this: &Browser) -> Downloads;
 
     #[wasm_bindgen(method, getter)]
     pub fn runtime(this: &Browser) -> Runtime;
 
     #[wasm_bindgen(method, getter)]
-    pub fn storage(this: &Browser) -> Storage;
+    pub fn sessions(this: &Browser) -> Sessions;
+
+    #[wasm_bindgen(method, getter, js_name = sidebarAction)]
+    pub fn sidebar_action(this: &Browser) -> SidebarAction;
 
     #[wasm_bindgen(method, getter)]
-    pub fn windows(this: &Browser) -> Windows;
+    pub fn storage(this: &Browser) -> Storage;
 
     #[wasm_bindgen(method, getter)]
     pub fn tabs(this: &Browser) -> Tabs;
 
     #[wasm_bindgen(method, getter)]
-    pub fn sessions(this: &Browser) -> Sessions;
+    pub fn windows(this: &Browser) -> Windows;
 }
 
 #[wasm_bindgen]
@@ -64,15 +61,11 @@ extern "C" {
     pub type Event;
 
     #[wasm_bindgen(method, js_name = addListener)]
-    pub fn add_listener(this: &Event, callback: &Function);
+    pub fn add_listener(this: &Event, listener: &Function);
 
     #[wasm_bindgen(method, js_name = removeListener)]
-    pub fn remove_listener(this: &Event, callback: &Function);
+    pub fn remove_listener(this: &Event, listener: &Function);
 
     #[wasm_bindgen(method, js_name = hasListener)]
-    pub fn has_listener(this: &Event, callback: &Function) -> bool;
-}
-
-pub mod traits {
-    pub use crate::storage::{StorageAreaRead, StorageAreaWrite};
+    pub fn has_listener(this: &Event, listener: &Function) -> bool;
 }
