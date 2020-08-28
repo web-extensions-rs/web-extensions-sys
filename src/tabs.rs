@@ -1,5 +1,5 @@
 use crate::Event;
-use js_sys::{Object, Promise};
+use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -179,109 +179,109 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = TAB_ID_NONE)]
     pub fn tab_id_none(this: &Tabs) -> i32;
 
-    #[wasm_bindgen(method, js_name = captureTab)]
-    pub fn capture_tab(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = captureTab)]
+    pub async fn capture_tab(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = captureVisibleTab)]
-    pub fn capture_visible_tab(
+    #[wasm_bindgen(catch, method, js_name = captureVisibleTab)]
+    pub async fn capture_visible_tab(
         this: &Tabs,
         window_id: Option<i32>,
         info: Option<&Object>,
-    ) -> Promise;
+    ) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn connect(this: &Tabs, tab_id: i32, info: Option<&Object>) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn connect(this: &Tabs, tab_id: i32, info: Option<&Object>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn create(this: &Tabs, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn create(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn discard(this: &Tabs, tab_ids: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn discard(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn duplicate(this: &Tabs, tab_id: i32) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn duplicate(this: &Tabs, tab_id: i32) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = executeScript)]
-    pub fn execute_script(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = executeScript)]
+    pub async fn execute_script(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn get(this: &Tabs, tab_id: i32) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn get(this: &Tabs, tab_id: i32) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getCurrent)]
-    pub fn get_current(this: &Tabs) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getCurrent)]
+    pub async fn get_current(this: &Tabs) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getZoom)]
-    pub fn get_zoom(this: &Tabs, tab_id: Option<i32>) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getZoom)]
+    pub async fn get_zoom(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getZoomSettings)]
-    pub fn get_zoom_settings(this: &Tabs, tab_id: Option<i32>) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getZoomSettings)]
+    pub async fn get_zoom_settings(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn hide(this: &Tabs, tab_ids: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn hide(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn highlight(this: &Tabs, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn highlight(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = insertCSS)]
-    pub fn insert_css(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = insertCSS)]
+    pub async fn insert_css(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = move)]
-    pub fn move_(this: &Tabs, tab_ids: &JsValue, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = move)]
+    pub async fn move_(this: &Tabs, tab_ids: &JsValue, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = moveInSuccession)]
-    pub fn move_in_succession(
+    #[wasm_bindgen(catch, method, js_name = moveInSuccession)]
+    pub async fn move_in_succession(
         this: &Tabs,
         tab_ids: &JsValue,
         tab_id: Option<i32>,
         info: Option<&Object>,
-    ) -> Promise;
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method)]
     pub fn print(this: &Tabs);
 
-    #[wasm_bindgen(method, js_name = printPreview)]
-    pub fn print_preview(this: &Tabs) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = printPreview)]
+    pub async fn print_preview(this: &Tabs) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn query(this: &Tabs, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn query(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn reload(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn reload(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn remove(this: &Tabs, tab_ids: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn remove(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = removeCSS)]
-    pub fn remove_css(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = removeCSS)]
+    pub async fn remove_css(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = saveAsPDF)]
-    pub fn save_as_pdf(this: &Tabs, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = saveAsPDF)]
+    pub async fn save_as_pdf(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = sendMessage)]
-    pub fn send_message(
+    #[wasm_bindgen(catch, method, js_name = sendMessage)]
+    pub async fn send_message(
         this: &Tabs,
         tab_id: i32,
         message: &JsValue,
         info: Option<&Object>,
-    ) -> Promise;
+    ) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = setZoom)]
-    pub fn set_zoom(this: &Tabs, tab_id: Option<i32>, zoom_factor: f64) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = setZoom)]
+    pub async fn set_zoom(this: &Tabs, tab_id: Option<i32>, zoom_factor: f64) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = setZoomSettings)]
-    pub fn set_zoom_settings(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = setZoomSettings)]
+    pub async fn set_zoom_settings(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn show(this: &Tabs, tab_ids: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn show(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = toggleReaderMode)]
-    pub fn toggle_reader_mode(this: &Tabs, tab_id: Option<i32>) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = toggleReaderMode)]
+    pub async fn toggle_reader_mode(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn update(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn update(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = detectLanguage)]
-    pub fn detect_language(this: &Tabs, tab_id: Option<i32>) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = detectLanguage)]
+    pub async fn detect_language(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onActivated)]
     pub fn on_activated(this: &Tabs) -> Event;

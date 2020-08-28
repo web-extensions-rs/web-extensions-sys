@@ -1,16 +1,16 @@
 use crate::Event;
-use js_sys::{Object, Promise};
+use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
     pub type StorageAreaRead;
 
-    #[wasm_bindgen(method, js_name = "getBytesInUse")]
-    pub fn get_bytes_in_use(this: &StorageAreaRead, keys: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = "getBytesInUse")]
+    pub async fn get_bytes_in_use(this: &StorageAreaRead, keys: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn get(this: &StorageAreaRead, keys: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn get(this: &StorageAreaRead, keys: &JsValue) -> Result<JsValue, JsValue>;
 }
 
 #[wasm_bindgen]
@@ -18,14 +18,14 @@ extern "C" {
     #[wasm_bindgen(extends = StorageAreaRead)]
     pub type StorageAreaWrite;
 
-    #[wasm_bindgen(method)]
-    pub fn set(this: &StorageAreaWrite, keys: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn set(this: &StorageAreaWrite, keys: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn remove(this: &StorageAreaWrite, keys: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn remove(this: &StorageAreaWrite, keys: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn clear(this: &StorageAreaWrite) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn clear(this: &StorageAreaWrite) -> Result<JsValue, JsValue>;
 }
 
 #[wasm_bindgen]

@@ -1,4 +1,4 @@
-use js_sys::{Object, Promise};
+use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 // TODO other methods
@@ -6,6 +6,6 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     pub type Downloads;
 
-    #[wasm_bindgen(method)]
-    pub fn download(this: &Downloads, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn download(this: &Downloads, info: &Object) -> Result<JsValue, JsValue>;
 }

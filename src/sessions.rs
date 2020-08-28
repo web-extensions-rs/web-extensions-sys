@@ -1,7 +1,7 @@
 use crate::tabs::Tab;
 use crate::windows::Window;
 use crate::Event;
-use js_sys::{Object, Promise};
+use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -27,36 +27,35 @@ extern "C" {
     // TODO is u32 correct ?
     pub fn max_session_results(this: &Sessions) -> u32;
 
-    #[wasm_bindgen(method, js_name = forgetClosedTab)]
-    pub fn forget_closed_tab(this: &Sessions, window_id: i32, session_id: &str) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = forgetClosedTab)]
+    pub async fn forget_closed_tab(this: &Sessions, window_id: i32, session_id: &str) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = forgetClosedWindow)]
-    pub fn forget_closed_window(this: &Sessions, session_id: &str) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = forgetClosedWindow)]
+    pub async fn forget_closed_window(this: &Sessions, session_id: &str) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getRecentlyClosed)]
-    pub fn get_recently_closed(this: &Sessions, filter: Option<&Object>) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getRecentlyClosed)]
+    pub async fn get_recently_closed(this: &Sessions, filter: Option<&Object>) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn restore(this: &Sessions, session_id: &str) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn restore(this: &Sessions, session_id: &str) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getTabValue)]
-    pub fn get_tab_value(this: &Sessions, tab_id: i32, key: &str) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getTabValue)]
+    pub async fn get_tab_value(this: &Sessions, tab_id: i32, key: &str) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = setTabValue)]
-    pub fn set_tab_value(this: &Sessions, tab_id: i32, key: &str, value: &JsValue) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = setTabValue)]
+    pub async fn set_tab_value(this: &Sessions, tab_id: i32, key: &str, value: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = removeTabValue)]
-    pub fn remove_tab_value(this: &Sessions, tab_id: i32, key: &str) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = removeTabValue)]
+    pub async fn remove_tab_value(this: &Sessions, tab_id: i32, key: &str) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getWindowValue)]
-    pub fn get_window_value(this: &Sessions, window_id: i32, key: &str) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getWindowValue)]
+    pub async fn get_window_value(this: &Sessions, window_id: i32, key: &str) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = setWindowValue)]
-    pub fn set_window_value(this: &Sessions, window_id: i32, key: &str, value: &JsValue)
-        -> Promise;
+    #[wasm_bindgen(catch, method, js_name = setWindowValue)]
+    pub async fn set_window_value(this: &Sessions, window_id: i32, key: &str, value: &JsValue) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = removeWindowValue)]
-    pub fn remove_window_value(this: &Sessions, window_id: i32, key: &str) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = removeWindowValue)]
+    pub async fn remove_window_value(this: &Sessions, window_id: i32, key: &str) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onChanged)]
     pub fn on_changed(this: &Sessions) -> Event;

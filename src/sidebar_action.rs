@@ -1,4 +1,4 @@
-use js_sys::{Object, Promise};
+use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
 // TODO
@@ -6,9 +6,9 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     pub type SidebarAction;
 
-    #[wasm_bindgen(method)]
-    pub fn open(this: &SidebarAction) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn open(this: &SidebarAction) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = setPanel)]
-    pub fn set_panel(this: &SidebarAction, details: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = setPanel)]
+    pub async fn set_panel(this: &SidebarAction, details: &Object) -> Result<JsValue, JsValue>;
 }

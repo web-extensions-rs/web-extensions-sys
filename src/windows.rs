@@ -1,5 +1,5 @@
 use crate::Event;
-use js_sys::{Array, Object, Promise};
+use js_sys::{Array, Object};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -62,26 +62,26 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = WINDOW_ID_CURRENT)]
     pub fn window_id_current(this: &Windows) -> i32;
 
-    #[wasm_bindgen(method)]
-    pub fn get(this: &Windows, window_id: i32, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn get(this: &Windows, window_id: i32, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getCurrent)]
-    pub fn get_current(this: &Windows, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getCurrent)]
+    pub async fn get_current(this: &Windows, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getLastFocused)]
-    pub fn get_last_focused(this: &Windows, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getLastFocused)]
+    pub async fn get_last_focused(this: &Windows, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = getAll)]
-    pub fn get_all(this: &Windows, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method, js_name = getAll)]
+    pub async fn get_all(this: &Windows, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn create(this: &Windows, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn create(this: &Windows, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn update(this: &Windows, window_id: i32, info: &Object) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn update(this: &Windows, window_id: i32, info: &Object) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method)]
-    pub fn remove(this: &Windows, window_id: i32) -> Promise;
+    #[wasm_bindgen(catch, method)]
+    pub async fn remove(this: &Windows, window_id: i32) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onCreated)]
     pub fn on_created(this: &Windows) -> Event;
