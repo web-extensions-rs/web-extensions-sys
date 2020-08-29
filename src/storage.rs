@@ -1,4 +1,4 @@
-use crate::Event;
+use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
@@ -56,7 +56,7 @@ extern "C" {
     pub fn managed(this: &Storage) -> Managed;
 
     #[wasm_bindgen(method, getter, js_name = onChanged)]
-    pub fn on_changed(this: &Storage) -> Event;
+    pub fn on_changed(this: &Storage) -> EventTarget;
 }
 
 #[wasm_bindgen]

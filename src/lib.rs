@@ -63,14 +63,14 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
-    pub type Event;
+    pub type EventTarget;
 
     #[wasm_bindgen(method, js_name = addListener)]
-    pub fn add_listener(this: &Event, listener: &Function);
+    pub fn add_listener(this: &EventTarget, listener: &Function);
 
     #[wasm_bindgen(method, js_name = removeListener)]
-    pub fn remove_listener(this: &Event, listener: &Function);
+    pub fn remove_listener(this: &EventTarget, listener: &Function);
 
     #[wasm_bindgen(method, js_name = hasListener)]
-    pub fn has_listener(this: &Event, listener: &Function) -> bool;
+    pub fn has_listener(this: &EventTarget, listener: &Function) -> bool;
 }

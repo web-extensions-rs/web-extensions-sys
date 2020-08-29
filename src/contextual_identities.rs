@@ -1,4 +1,4 @@
-use crate::Event;
+use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
@@ -23,11 +23,11 @@ extern "C" {
     pub async fn remove(this: &ContextualIdentities, cookie_store_id: &str) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onCreated)]
-    pub fn on_created(this: &ContextualIdentities) -> Event;
+    pub fn on_created(this: &ContextualIdentities) -> EventTarget;
 
     #[wasm_bindgen(method, getter, js_name = onRemoved)]
-    pub fn on_removed(this: &ContextualIdentities) -> Event;
+    pub fn on_removed(this: &ContextualIdentities) -> EventTarget;
 
     #[wasm_bindgen(method, getter, js_name = onUpdated)]
-    pub fn on_updated(this: &ContextualIdentities) -> Event;
+    pub fn on_updated(this: &ContextualIdentities) -> EventTarget;
 }

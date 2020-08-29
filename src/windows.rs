@@ -1,4 +1,4 @@
-use crate::Event;
+use crate::EventTarget;
 use js_sys::{Array, Object};
 use wasm_bindgen::prelude::*;
 
@@ -85,11 +85,11 @@ extern "C" {
     pub async fn remove(this: &Windows, window_id: i32) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onCreated)]
-    pub fn on_created(this: &Windows) -> Event;
+    pub fn on_created(this: &Windows) -> EventTarget;
 
     #[wasm_bindgen(method, getter, js_name = onRemoved)]
-    pub fn on_removed(this: &Windows) -> Event;
+    pub fn on_removed(this: &Windows) -> EventTarget;
 
     #[wasm_bindgen(method, getter, js_name = onFocusChanged)]
-    pub fn on_focus_changed(this: &Windows) -> Event;
+    pub fn on_focus_changed(this: &Windows) -> EventTarget;
 }

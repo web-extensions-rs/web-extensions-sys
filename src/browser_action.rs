@@ -1,4 +1,4 @@
-use crate::Event;
+use crate::EventTarget;
 use wasm_bindgen::prelude::*;
 
 // TODO
@@ -7,5 +7,5 @@ extern "C" {
     pub type BrowserAction;
 
     #[wasm_bindgen(method, getter, js_name = onClicked)]
-    pub fn on_clicked(this: &BrowserAction) -> Event;
+    pub fn on_clicked(this: &BrowserAction) -> EventTarget;
 }
