@@ -311,6 +311,6 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = onUpdated)]
     pub fn on_updated(this: &Tabs) -> EventTarget;
 
-    #[wasm_bindgen(method, getter, js_name = onZoomChanged)]
-    pub fn on_zoom_changed(this: &Tabs) -> EventTarget;
+    #[wasm_bindgen(method, getter, js_name = onZoomChange)]
+    pub fn on_zoom_change(this: &Tabs) -> EventTarget;
 }
