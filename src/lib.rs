@@ -33,7 +33,11 @@ pub mod traits {
 extern "C" {
     pub type Browser;
 
+    // This is used for Mozilla Firefox Addons
     pub static browser: Browser;
+
+    // This is used for Google Chrome Extensions
+    pub static chrome: Browser;
 
     #[wasm_bindgen(method, getter, js_name = browserAction)]
     pub fn browser_action(this: &Browser) -> BrowserAction;

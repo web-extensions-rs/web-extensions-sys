@@ -1,0 +1,20 @@
+{
+    "name": "Basic Web Extension",
+    "description": "A basic Web Extension written in Rust",
+    "version": "0.0.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "./background-script/index.js",
+        "type": "module"
+    },
+    "permissions": [
+        "activeTab",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://*/*"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    }
+}
