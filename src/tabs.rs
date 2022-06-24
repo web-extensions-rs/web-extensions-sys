@@ -70,6 +70,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-MutedInfo
     #[derive(Debug)]
     pub type TabMutedInfo;
 
@@ -172,7 +173,6 @@ extern "C" {
     pub fn window_id(this: &Tab) -> i32;
 }
 
-#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type Tabs;
@@ -181,7 +181,11 @@ extern "C" {
     pub fn tab_id_none(this: &Tabs) -> i32;
 
     #[wasm_bindgen(catch, method, js_name = captureTab)]
-    pub async fn capture_tab(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Result<JsValue, JsValue>;
+    pub async fn capture_tab(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: Option<&Object>,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = captureVisibleTab)]
     pub async fn capture_visible_tab(
@@ -191,7 +195,11 @@ extern "C" {
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn connect(this: &Tabs, tab_id: i32, info: Option<&Object>) -> Result<JsValue, JsValue>;
+    pub async fn connect(
+        this: &Tabs,
+        tab_id: i32,
+        info: Option<&Object>,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn create(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
@@ -203,7 +211,11 @@ extern "C" {
     pub async fn duplicate(this: &Tabs, tab_id: i32) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = executeScript)]
-    pub async fn execute_script(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
+    pub async fn execute_script(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: &Object,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn get(this: &Tabs, tab_id: i32) -> Result<JsValue, JsValue>;
@@ -224,7 +236,11 @@ extern "C" {
     pub async fn highlight(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = insertCSS)]
-    pub async fn insert_css(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
+    pub async fn insert_css(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: &Object,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = move)]
     pub async fn move_(this: &Tabs, tab_ids: &JsValue, info: &Object) -> Result<JsValue, JsValue>;
@@ -247,13 +263,21 @@ extern "C" {
     pub async fn query(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn reload(this: &Tabs, tab_id: Option<i32>, info: Option<&Object>) -> Result<JsValue, JsValue>;
+    pub async fn reload(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: Option<&Object>,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn remove(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = removeCSS)]
-    pub async fn remove_css(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
+    pub async fn remove_css(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: &Object,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = saveAsPDF)]
     pub async fn save_as_pdf(this: &Tabs, info: &Object) -> Result<JsValue, JsValue>;
@@ -267,10 +291,18 @@ extern "C" {
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = setZoom)]
-    pub async fn set_zoom(this: &Tabs, tab_id: Option<i32>, zoom_factor: f64) -> Result<JsValue, JsValue>;
+    pub async fn set_zoom(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        zoom_factor: f64,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = setZoomSettings)]
-    pub async fn set_zoom_settings(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
+    pub async fn set_zoom_settings(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: &Object,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn show(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
@@ -279,7 +311,11 @@ extern "C" {
     pub async fn toggle_reader_mode(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn update(this: &Tabs, tab_id: Option<i32>, info: &Object) -> Result<JsValue, JsValue>;
+    pub async fn update(
+        this: &Tabs,
+        tab_id: Option<i32>,
+        info: &Object,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = detectLanguage)]
     pub async fn detect_language(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
@@ -313,4 +349,51 @@ extern "C" {
 
     #[wasm_bindgen(method, getter, js_name = onZoomChange)]
     pub fn on_zoom_change(this: &Tabs) -> EventTarget;
+}
+
+#[wasm_bindgen]
+extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onUpdated-callback-changeInfo
+    #[derive(Debug)]
+    pub type TabChangeInfo;
+
+    // The tab's new audible state.
+    #[wasm_bindgen(method, getter)]
+    pub fn audible(this: &TabChangeInfo) -> Option<bool>;
+
+    // The tab's new auto-discardable state.
+    #[wasm_bindgen(method, getter, js_name = autoDiscardable)]
+    pub fn auto_discardable(this: &TabChangeInfo) -> Option<bool>;
+
+    // The tab's new discarded state.
+    #[wasm_bindgen(method, getter)]
+    pub fn discarded(this: &TabChangeInfo) -> Option<bool>;
+
+    // The tab's new favicon URL.
+    #[wasm_bindgen(method, getter, js_name = favIconUrl)]
+    pub fn fav_icon_url(this: &TabChangeInfo) -> Option<String>;
+
+    // The tab's new group.
+    #[wasm_bindgen(method, getter, js_name = groupId)]
+    pub fn group_id(this: &TabChangeInfo) -> Option<i32>; // TODO: is i32 correct?
+
+    // The tab's new muted state and the reason for the change.
+    #[wasm_bindgen(method, getter, js_name = mutedInfo)]
+    pub fn muted_info(this: &TabChangeInfo) -> Option<TabMutedInfo>;
+
+    // The tab's new pinned state.
+    #[wasm_bindgen(method, getter)]
+    pub fn pinned(this: &TabChangeInfo) -> Option<bool>;
+
+    // The tab's loading status.
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &TabChangeInfo) -> Option<String>;
+
+    // The tab's new title.
+    #[wasm_bindgen(method, getter)]
+    pub fn title(this: &TabChangeInfo) -> Option<String>;
+
+    // The tab's URL if it has changed.
+    #[wasm_bindgen(method, getter)]
+    pub fn url(this: &TabChangeInfo) -> Option<String>;
 }
