@@ -5,7 +5,9 @@ A basic Web Extension for Google Chrome (version `>= 102`) written in Rust.
 ## Build
 
 ```
-wasm-pack build --release -t web
+cd background-script/ && wasm-pack build --release -t web
+cd ../
+cd foreground-script/ && wasm-pack build --release -t no-modules
 ```
 
 ## Run

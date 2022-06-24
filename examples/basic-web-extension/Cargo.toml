@@ -1,6 +1,7 @@
 [workspace]
 members = [
-  "background-script"
+  "background-script",
+  "foreground-script"
 ]
 
 [patch.crates-io]
