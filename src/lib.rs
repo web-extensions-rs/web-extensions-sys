@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 use js_sys::Function;
 use wasm_bindgen::prelude::*;
 
