@@ -1,7 +1,11 @@
 [package]
 name = "web-extensions-sys"
 version = "0.1.0"
-authors = ["Roman Volosatovs <rvolosatovs@riseup.net>", "Pauan <pcxunlimited@gmail.com>"]
+authors = [
+  "Roman Volosatovs <rvolosatovs@riseup.net>",
+  "Pauan <pcxunlimited@gmail.com>",
+  "Markus Kohlhase <markus.kohlhase@slowtec.de>",
+]
 edition = "2021"
 description = "This crate provides WebExtension API WASM bindings"
 repository = "https://github.com/web-extensions-rs/web-extensions-sys"
