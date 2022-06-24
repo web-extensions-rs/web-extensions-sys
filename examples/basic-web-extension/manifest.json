@@ -9,12 +9,18 @@
     },
     "permissions": [
         "activeTab",
-        "tabs"
+        "tabs",
+        "scripting"
     ],
     "host_permissions": [
         "https://*/*"
     ],
     "content_security_policy": {
         "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
-    }
+    },
+    "web_accessible_resources": [{
+       "resources": [ "foreground-script/pkg/foreground_script_bg.wasm" ],
+       "matches": [ "https://*/*" ],
+       "extension_ids": []
+    }]
 }
