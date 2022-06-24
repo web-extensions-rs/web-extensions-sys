@@ -8,6 +8,7 @@ mod contextual_identities;
 mod downloads;
 mod port;
 mod runtime;
+mod scripting;
 mod sessions;
 mod sidebar_action;
 mod storage;
@@ -19,6 +20,7 @@ pub use contextual_identities::*;
 pub use downloads::*;
 pub use port::*;
 pub use runtime::*;
+pub use scripting::*;
 pub use sessions::*;
 pub use sidebar_action::*;
 pub use storage::*;
@@ -65,6 +67,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn windows(this: &Browser) -> Windows;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn scripting(this: &Browser) -> Scripting;
 }
 
 #[wasm_bindgen]
