@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 [dependencies]
 gloo-console = "0.2.1"
 js-sys = "0.3.58"
+messages = { version = "0.0.0", path = "../messages" }
 serde = { version = "1.0.137", features = ["derive"] }
 wasm-bindgen = { version = "0.2.81", features = ["serde-serialize"] }
 wasm-bindgen-futures = "0.4.31"

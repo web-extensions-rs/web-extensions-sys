@@ -8,6 +8,7 @@ A basic Web Extension for Google Chrome (version `>= 102`) written in Rust.
 cd background-script/ && wasm-pack build --release -t web
 cd ../
 cd foreground-script/ && wasm-pack build --release -t no-modules
+cd options/ && wasm-pack build --release -t web
 ```
 
 ## Run
