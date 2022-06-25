@@ -6,7 +6,10 @@ use wasm_bindgen::prelude::*;
 pub fn start() {
     console::info!("Start foreground script");
     let container = document().create_element("div").unwrap();
-    container.class_list().add_1("wea-example-container").unwrap();
+    container
+        .class_list()
+        .add_1("wea-example-container")
+        .unwrap();
 
     let title = document().create_element("h2").unwrap();
     title.set_inner_html("Example Web Extension Foreground");
