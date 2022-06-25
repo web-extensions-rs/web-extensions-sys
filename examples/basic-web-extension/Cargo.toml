@@ -1,11 +1,14 @@
 [workspace]
 members = [
   "background-script",
-  "foreground-script"
+  "foreground-script",
+  "options",
+  "messages"
 ]
 
 [patch.crates-io]
-web-extensions-sys = { path = "../../" }
+messages           = { path = "messages" }
+web-extensions-sys = { path = "../../"   }
 
 [profile.release]
 lto = true

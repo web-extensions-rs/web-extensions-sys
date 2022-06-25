@@ -1,10 +1,26 @@
 use gloo_console as console;
 use gloo_utils::{body, document};
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, JsCast};
+use web_extensions_sys::{chrome, Port};
 
 #[wasm_bindgen]
 pub fn start() {
     console::info!("Start foreground script");
+    render_container();
+    let port = connect();
+
+    let on_message = |msg: JsValue| {
+        console::info!("Received message:", msg);
+    };
+    let closure: Closure<dyn Fn(JsValue)> = Closure::new(on_message);
+    let callback = closure.as_ref().unchecked_ref();
+    port.on_message().add_listener(callback);
+    closure.forget();
+    let msg = JsValue::from_serde(&messages::Request::Ping).unwrap();
+    port.post_message(&msg);
+}
+
+fn render_container() {
     let container = document().create_element("div").unwrap();
     container
         .class_list()
@@ -20,4 +36,11 @@ pub fn start() {
     container.append_child(&title).unwrap();
     container.append_child(&data).unwrap();
     body().append_child(&container).unwrap();
+}
+
+fn connect() -> Port {
+    let connect_info = JsValue::null();
+    chrome
+        .runtime()
+        .connect(None, connect_info.as_ref().unchecked_ref())
 }
