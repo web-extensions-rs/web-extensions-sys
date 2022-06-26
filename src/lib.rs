@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 mod browser_action;
 mod contextual_identities;
 mod downloads;
+mod history;
 mod port;
 mod runtime;
 mod scripting;
@@ -18,6 +19,7 @@ mod windows;
 pub use browser_action::*;
 pub use contextual_identities::*;
 pub use downloads::*;
+pub use history::*;
 pub use port::*;
 pub use runtime::*;
 pub use scripting::*;
@@ -70,6 +72,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn scripting(this: &Browser) -> Scripting;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn history(this: &Browser) -> History;
 }
 
 #[wasm_bindgen]
