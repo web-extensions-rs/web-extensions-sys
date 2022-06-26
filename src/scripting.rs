@@ -9,9 +9,9 @@ extern "C" {
 
     // https://developer.chrome.com/docs/extensions/reference/scripting/#method-insertCSS
     #[wasm_bindgen(method, catch, js_name = insertCSS)]
-    pub async fn insert_css(this: &Scripting, options: Object) -> Result<(), JsValue>;
+    pub async fn insert_css(this: &Scripting, options: &Object) -> Result<(), JsValue>;
 
     // https://developer.chrome.com/docs/extensions/reference/scripting/#method-executeScript
     #[wasm_bindgen(method, catch, js_name = executeScript)]
-    pub async fn execute_script(this: &Scripting, options: Object) -> Result<JsValue, JsValue>;
+    pub async fn execute_script(this: &Scripting, options: &Object) -> Result<JsValue, JsValue>;
 }
