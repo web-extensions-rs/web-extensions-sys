@@ -9,6 +9,7 @@ mod commands;
 mod contextual_identities;
 mod downloads;
 mod history;
+mod identity;
 mod port;
 mod runtime;
 mod scripting;
@@ -24,6 +25,7 @@ pub use commands::*;
 pub use contextual_identities::*;
 pub use downloads::*;
 pub use history::*;
+pub use identity::*;
 pub use port::*;
 pub use runtime::*;
 pub use scripting::*;
@@ -85,6 +87,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn commands(this: &Browser) -> Commands;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn identity(this: &Browser) -> Identity;
 }
 
 #[wasm_bindgen]
