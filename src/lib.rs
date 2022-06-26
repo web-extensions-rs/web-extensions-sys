@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 
 mod bookmarks;
 mod browser_action;
+mod commands;
 mod contextual_identities;
 mod downloads;
 mod history;
@@ -19,6 +20,7 @@ mod windows;
 
 pub use bookmarks::*;
 pub use browser_action::*;
+pub use commands::*;
 pub use contextual_identities::*;
 pub use downloads::*;
 pub use history::*;
@@ -80,6 +82,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn bookmarks(this: &Browser) -> Bookmarks;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn commands(this: &Browser) -> Commands;
 }
 
 #[wasm_bindgen]
