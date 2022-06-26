@@ -3,6 +3,7 @@
 use js_sys::Function;
 use wasm_bindgen::prelude::*;
 
+mod bookmarks;
 mod browser_action;
 mod contextual_identities;
 mod downloads;
@@ -16,6 +17,7 @@ mod storage;
 mod tabs;
 mod windows;
 
+pub use bookmarks::*;
 pub use browser_action::*;
 pub use contextual_identities::*;
 pub use downloads::*;
@@ -75,6 +77,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn history(this: &Browser) -> History;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn bookmarks(this: &Browser) -> Bookmarks;
 }
 
 #[wasm_bindgen]
