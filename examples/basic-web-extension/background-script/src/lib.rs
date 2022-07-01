@@ -1,6 +1,6 @@
 use gloo_console as console;
 use js_sys::{Function, Object};
-use messages::{Request, Response};
+use messages::{PortRequest, PortResponse, Request, Response};
 use serde::Serialize;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_extensions_sys::{chrome, Port, Tab, TabChangeInfo};
@@ -11,68 +11,138 @@ type TabId = i32;
 
 #[wasm_bindgen]
 pub fn start() {
-    console::info!("Start background script");
+    console::info!("Starting background script");
 
-    let on_message = |message: JsValue, sender, send_response: Function| {
-        console::debug!("Received message", &message, &sender);
-        if let Some(response) = handle_message(message) {
-            let this = JsValue::null();
-            send_response.call1(&this, &response).unwrap();
-        }
-    };
     let closure: Closure<dyn Fn(JsValue, JsValue, Function)> = Closure::new(on_message);
-    let callback = closure.as_ref().unchecked_ref();
-    chrome.runtime().on_message().add_listener(callback);
+    chrome
+        .runtime()
+        .on_message()
+        .add_listener(closure.as_ref().unchecked_ref());
     closure.forget();
 
-    let on_tab_changed = |tab_id, change_info: TabChangeInfo, tab: Tab| {
-        console::info!("Tab changed", tab_id, &change_info, &tab);
-        if change_info.status() == Some("complete".to_string()) {
-            if let Some(url) = tab.url() {
-                if url.starts_with("http") {
-                    console::info!("inject foreground script");
-                    wasm_bindgen_futures::spawn_local(inject_frontend(tab_id));
-                }
-            }
-        }
-    };
-    let listener: Closure<dyn Fn(TabId, TabChangeInfo, Tab)> = Closure::new(on_tab_changed);
+    let closure: Closure<dyn Fn(TabId, TabChangeInfo, Tab)> = Closure::new(on_tab_changed);
     chrome
         .tabs()
         .on_updated()
-        .add_listener(listener.as_ref().unchecked_ref());
-    listener.forget();
+        .add_listener(closure.as_ref().unchecked_ref());
+    closure.forget();
 
-    let on_connect = |port: Port| {
-        console::info!("A new port has connected", &port);
-        let port_clone = port.clone();
-        let on_message = move |msg| {
-            console::info!("Received message", &msg);
-            if let Some(response) = handle_message(msg) {
-                port_clone.post_message(&response);
-            }
-        };
-        let closure: Closure<dyn Fn(JsValue)> = Closure::new(on_message);
-        port.on_message()
-            .add_listener(closure.as_ref().unchecked_ref());
-        closure.forget();
-    };
-    let closure: Closure<dyn Fn(Port)> = Closure::new(on_connect);
-    let callback = closure.as_ref().unchecked_ref();
-    chrome.runtime().on_connect().add_listener(callback);
+    let closure: Closure<dyn Fn(Port)> = Closure::new(on_connect_port);
+    chrome
+        .runtime()
+        .on_connect()
+        .add_listener(closure.as_ref().unchecked_ref());
     closure.forget();
 }
 
-fn handle_message(msg: JsValue) -> Option<JsValue> {
-    msg.into_serde().ok().map(|request| {
-        let response = match request {
-            Request::Ping => Response::Pong,
-            Request::GetOptionsInfo => Response::OptionsInfo {
-                version: VERSION.to_string(),
-            },
-        };
-        JsValue::from_serde(&response).unwrap()
-    })
+fn on_message(request: JsValue, sender: JsValue, send_response: Function) {
+    console::debug!("Received request message", &request, &sender);
+    if let Some(response) = handle_request(request) {
+        let this = JsValue::null();
+        if let Err(err) = send_response.call1(&this, &response) {
+            console::error!(
+                "Failed to send response message",
+                send_response,
+                response,
+                err
+            );
+        }
+    }
+}
+
+fn on_tab_changed(tab_id: i32, change_info: TabChangeInfo, tab: Tab) {
+    console::info!("Tab changed", tab_id, &tab, &change_info);
+    if change_info.status().as_deref() == Some("complete") {
+        if let Some(url) = tab.url() {
+            if url.starts_with("http") {
+                console::info!("Injecting foreground script on tab", tab_id, &tab);
+                wasm_bindgen_futures::spawn_local(inject_frontend(tab_id));
+            }
+        }
+    }
+}
+
+fn on_connect_port(port: Port) {
+    console::info!("Connecting new port", &port);
+    let on_message = {
+        let port = port.clone();
+        move |request| {
+            on_port_message(&port, request);
+        }
+    };
+    let closure: Closure<dyn Fn(JsValue)> = Closure::new(on_message);
+    port.on_message()
+        .add_listener(closure.as_ref().unchecked_ref());
+    closure.forget();
+}
+
+fn on_port_message(port: &Port, request: JsValue) {
+    console::debug!("Received request message on port", port, &request);
+    if let Some(response) = handle_port_request(request) {
+        console::debug!("Posting response message on port", port, &response);
+        port.post_message(&response);
+    }
+}
+
+fn handle_request(request: JsValue) -> Option<JsValue> {
+    let request = request
+        .into_serde()
+        .map_err(|err| {
+            console::error!("Failed to deserialize request message", &err.to_string());
+        })
+        .ok()?;
+    let response = handle_request_domain(request);
+    JsValue::from_serde(&response)
+        .map_err(|err| {
+            console::error!("Failed to serialize response message", &err.to_string());
+        })
+        .ok()
+}
+
+fn handle_port_request(request: JsValue) -> Option<JsValue> {
+    let request = request
+        .into_serde()
+        .map_err(|err| {
+            console::error!(
+                "Failed to deserialize port request message",
+                &err.to_string()
+            );
+        })
+        .ok()?;
+    let response = handle_port_request_domain(request);
+    JsValue::from_serde(&response)
+        .map_err(|err| {
+            console::error!(
+                "Failed to serialize port response message",
+                &err.to_string()
+            );
+        })
+        .ok()
+}
+
+/// Handle a (global) request.
+///
+/// Optionally returns a single response.
+///
+/// TODO: Extract into domain crate
+fn handle_request_domain(request: Request) -> Option<Response> {
+    match request {
+        Request::GetOptionsInfo => Response::OptionsInfo {
+            version: VERSION.to_string(),
+        }
+        .into(),
+    }
+}
+
+/// Handle a port-local request.
+///
+/// Optionally returns a single response.
+///
+/// TODO: Extract into domain crate
+fn handle_port_request_domain(request: PortRequest) -> Option<PortResponse> {
+    match request {
+        PortRequest::Ping => PortResponse::Pong.into(),
+    }
 }
 
 // https://developer.chrome.com/docs/extensions/reference/scripting/#type-CSSInjection

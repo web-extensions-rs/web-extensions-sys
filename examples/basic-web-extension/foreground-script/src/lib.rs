@@ -16,7 +16,7 @@ pub fn start() {
     let callback = closure.as_ref().unchecked_ref();
     port.on_message().add_listener(callback);
     closure.forget();
-    let msg = JsValue::from_serde(&messages::Request::Ping).unwrap();
+    let msg = JsValue::from_serde(&messages::PortRequest::Ping).unwrap();
     port.post_message(&msg);
 }
 
