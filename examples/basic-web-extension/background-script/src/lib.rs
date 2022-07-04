@@ -1,35 +1,129 @@
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
+
 use gloo_console as console;
 use js_sys::{Function, Object};
 use messages::{PortRequest, PortResponse, Request, Response, StreamResponse};
 use serde::Serialize;
-use std::{cell::RefCell, collections::HashMap, sync::Arc};
+use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsCast};
+
 use web_extensions_sys::{chrome, Port, Tab, TabChangeInfo};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 type TabId = i32;
 
+type RequestId = usize;
+
+const FIRST_REQUEST_ID: RequestId = 1;
+
+const INITIAL_REQUEST_ID: RequestId = FIRST_REQUEST_ID - 1;
+
+fn next_request_id(last_request_id: RequestId) -> RequestId {
+    last_request_id.wrapping_add(1).max(FIRST_REQUEST_ID)
+}
+
+type PortId = usize;
+
+const FIRST_PORT_ID: RequestId = 1;
+
+#[derive(Debug)]
+struct PortContext {
+    port: Port,
+    last_request_id: RequestId,
+}
+
+impl PortContext {
+    const fn new(port: Port) -> Self {
+        Self {
+            port,
+            last_request_id: INITIAL_REQUEST_ID,
+        }
+    }
+
+    fn next_request_id(&mut self) -> RequestId {
+        let next_request_id = next_request_id(self.last_request_id);
+        self.last_request_id = next_request_id;
+        next_request_id
+    }
+}
+
+#[derive(Default)]
+struct ConnectedPorts {
+    last_id: PortId,
+    ctx_by_id: HashMap<PortId, PortContext>,
+}
+
+#[derive(Debug, Error)]
+enum PortError {
+    #[error("not connected")]
+    NotConnected,
+}
+
+impl ConnectedPorts {
+    fn connect(&mut self, port: Port) -> Option<PortId> {
+        let id = self.last_id.checked_add(1)?;
+        debug_assert!(id >= FIRST_PORT_ID);
+        let ctx = PortContext::new(port);
+        self.ctx_by_id.insert(id, ctx);
+        Some(id)
+    }
+
+    fn disconnect(&mut self, id: PortId) -> Option<Port> {
+        self.ctx_by_id
+            .remove(&id)
+            .map(|PortContext { port, .. }| port)
+    }
+
+    fn post_message(&self, id: PortId, msg: &JsValue) -> Result<(), PortError> {
+        self.ctx_by_id
+            .get(&id)
+            .ok_or(PortError::NotConnected)
+            .map(|ctx| {
+                let PortContext {
+                    port,
+                    last_request_id: _,
+                } = ctx;
+                console::debug!("Posting message on port", port, msg);
+                port.post_message(msg);
+            })
+    }
+
+    fn next_request_id(&mut self, id: PortId) -> Result<RequestId, PortError> {
+        self.ctx_by_id
+            .get_mut(&id)
+            .ok_or(PortError::NotConnected)
+            .map(|ctx| ctx.next_request_id())
+    }
+}
+
 #[derive(Default)]
 struct App {
-    port_counter: RefCell<usize>,
-    ports: RefCell<HashMap<usize, Port>>,
+    last_request_id: RequestId,
+    connected_ports: ConnectedPorts,
 }
 
 impl App {
-    fn add_port(&self, port: Port) -> usize {
-        *self.port_counter.borrow_mut() += 1;
-        let port_id = *self.port_counter.borrow();
-        self.ports.borrow_mut().insert(port_id, port.clone());
-        port_id
+    fn next_request_id(&mut self) -> RequestId {
+        let next_request_id = next_request_id(self.last_request_id);
+        self.last_request_id = next_request_id;
+        next_request_id
     }
-    fn send_response_to_port(&self, port_id: usize, response: JsValue) {
-        if let Some(port) = self.ports.borrow().get(&port_id) {
-            console::debug!("Posting response message on port", port, &response);
-            port.post_message(&response);
-        } else {
-            console::warn!("Expected port ", port_id, "does not exist");
-        }
+
+    fn connect_port(&mut self, port: Port) -> Option<PortId> {
+        self.connected_ports.connect(port)
+    }
+
+    fn disconnect_port(&mut self, port_id: PortId) -> Option<Port> {
+        self.connected_ports.disconnect(port_id)
+    }
+
+    fn next_port_request_id(&mut self, port_id: PortId) -> Result<RequestId, PortError> {
+        self.connected_ports.next_request_id(port_id)
+    }
+
+    fn post_port_message(&self, port_id: PortId, msg: &JsValue) -> Result<(), PortError> {
+        self.connected_ports.post_message(port_id, msg)
     }
 }
 
@@ -37,8 +131,12 @@ impl App {
 pub fn start() {
     console::info!("Starting background script");
 
-    let app = Arc::new(App::default());
+    let app = Rc::new(RefCell::new(App::default()));
 
+    let on_message = {
+        let app = Rc::clone(&app);
+        move |request, sender, send_response| on_message(&app, request, sender, send_response)
+    };
     let closure: Closure<dyn Fn(JsValue, JsValue, Function)> = Closure::new(on_message);
     chrome
         .runtime()
@@ -53,9 +151,10 @@ pub fn start() {
         .add_listener(closure.as_ref().unchecked_ref());
     closure.forget();
 
-    let closure: Closure<dyn Fn(Port)> = Closure::new(move |port| {
-        on_connect_port(port, &app);
-    });
+    let on_connect = move |port| {
+        on_connect_port(&app, port);
+    };
+    let closure: Closure<dyn Fn(Port)> = Closure::new(on_connect);
     chrome
         .runtime()
         .on_connect()
@@ -63,9 +162,10 @@ pub fn start() {
     closure.forget();
 }
 
-fn on_message(request: JsValue, sender: JsValue, send_response: Function) {
+fn on_message(app: &Rc<RefCell<App>>, request: JsValue, sender: JsValue, send_response: Function) {
     console::debug!("Received request message", &request, &sender);
-    if let Some(response) = handle_request(request) {
+    let request_id = app.borrow_mut().next_request_id();
+    if let Some(response) = on_request(request_id, request) {
         let this = JsValue::null();
         if let Err(err) = send_response.call1(&this, &response) {
             console::error!(
@@ -90,13 +190,20 @@ fn on_tab_changed(tab_id: i32, change_info: TabChangeInfo, tab: Tab) {
     }
 }
 
-fn on_connect_port(port: Port, app: &Arc<App>) {
-    // TODO: How to notice a disconnection?
+fn on_connect_port(app: &Rc<RefCell<App>>, port: Port) {
+    // FIXME: How to notice a disconnection?
     console::info!("Connecting new port", &port);
-    let port_id = app.add_port(port.clone());
-    let app = Arc::clone(app);
-    let on_message = move |request| {
-        on_port_message(port_id, &app, request);
+    let port_id = if let Some(port_id) = app.borrow_mut().connect_port(port.clone()) {
+        port_id
+    } else {
+        console::error!("Failed to connect new port", &port);
+        return;
+    };
+    let on_message = {
+        let app = Rc::clone(app);
+        move |request| {
+            on_port_message(&app, port_id, request);
+        }
     };
     let closure: Closure<dyn Fn(JsValue)> = Closure::new(on_message);
     port.on_message()
@@ -104,21 +211,40 @@ fn on_connect_port(port: Port, app: &Arc<App>) {
     closure.forget();
 }
 
-fn on_port_message(port_id: usize, app: &Arc<App>, request: JsValue) {
+fn on_port_message(app: &Rc<RefCell<App>>, port_id: PortId, request: JsValue) {
     console::debug!("Received request message on port", port_id, &request);
-    if let Some(response) = handle_port_request(request) {
-        app.send_response_to_port(port_id, response);
+    let request_id = match app.borrow_mut().next_port_request_id(port_id) {
+        Ok(request_id) => request_id,
+        Err(err) => {
+            console::warn!(
+                "Failed to handle port request",
+                port_id,
+                request,
+                err.to_string()
+            );
+            return;
+        }
+    };
+    if let Some(response) = on_port_request(port_id, request_id, request) {
+        if let Err(err) = app.borrow().post_port_message(port_id, &response) {
+            console::warn!(
+                "Failed to post response message to port",
+                port_id,
+                response,
+                err.to_string()
+            );
+        }
     }
 }
 
-fn handle_request(request: JsValue) -> Option<JsValue> {
+fn on_request(request_id: RequestId, request: JsValue) -> Option<JsValue> {
     let request = request
         .into_serde()
         .map_err(|err| {
             console::error!("Failed to deserialize request message", &err.to_string());
         })
         .ok()?;
-    let response = handle_request_domain(request);
+    let response = handle_request(request_id, request);
     JsValue::from_serde(&response)
         .map_err(|err| {
             console::error!("Failed to serialize response message", &err.to_string());
@@ -126,7 +252,7 @@ fn handle_request(request: JsValue) -> Option<JsValue> {
         .ok()
 }
 
-fn handle_port_request(request: JsValue) -> Option<JsValue> {
+fn on_port_request(port_id: PortId, request_id: RequestId, request: JsValue) -> Option<JsValue> {
     let request = request
         .into_serde()
         .map_err(|err| {
@@ -136,7 +262,7 @@ fn handle_port_request(request: JsValue) -> Option<JsValue> {
             );
         })
         .ok()?;
-    let response = handle_port_request_domain(request);
+    let response = handle_port_request(port_id, request_id, request);
     JsValue::from_serde(&response)
         .map_err(|err| {
             console::error!(
@@ -152,7 +278,7 @@ fn handle_port_request(request: JsValue) -> Option<JsValue> {
 /// Optionally returns a single response.
 ///
 /// TODO: Extract into domain crate
-fn handle_request_domain(request: Request) -> Option<Response> {
+fn handle_request(_request_id: RequestId, request: Request) -> Option<Response> {
     match request {
         Request::GetOptionsInfo => Response::OptionsInfo {
             version: VERSION.to_string(),
@@ -166,7 +292,11 @@ fn handle_request_domain(request: Request) -> Option<Response> {
 /// Optionally returns a single response.
 ///
 /// TODO: Extract into domain crate
-fn handle_port_request_domain(request: PortRequest) -> Option<PortResponse> {
+fn handle_port_request(
+    _port_id: PortId,
+    _request_id: RequestId,
+    request: PortRequest,
+) -> Option<PortResponse> {
     match request {
         PortRequest::Ping => PortResponse::Pong.into(),
         PortRequest::StreamingExample => {
