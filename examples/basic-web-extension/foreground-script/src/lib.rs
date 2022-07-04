@@ -19,6 +19,10 @@ pub fn start() {
     let payload = messages::PortRequestPayload::Ping;
     let msg = JsValue::from_serde(&messages::Request::new(payload)).unwrap();
     port.post_message(&msg);
+
+    let payload = messages::PortRequestPayload::StartStreaming { num_items: 5 };
+    let msg = JsValue::from_serde(&messages::Request::new(payload)).unwrap();
+    port.post_message(&msg);
 }
 
 fn render_container() {
