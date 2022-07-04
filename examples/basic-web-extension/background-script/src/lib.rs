@@ -1,8 +1,13 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use gloo_console as console;
+use gloo_timers::future::TimeoutFuture;
 use js_sys::{Function, Object};
-use messages::{PortRequest, PortResponse, Request, Response, StreamResponse};
+use messages::{
+    next_request_id, AppRequest, AppRequestPayload, AppResponse, AppResponsePayload, PortRequest,
+    PortRequestPayload, PortResponse, PortResponsePayload, Request, RequestId, Response,
+    StreamingFinished, StreamingResponsePayload, StreamingStarted, INITIAL_REQUEST_ID,
+};
 use serde::Serialize;
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsCast};
@@ -12,16 +17,6 @@ use web_extensions_sys::{chrome, Port, Tab, TabChangeInfo};
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 type TabId = i32;
-
-type RequestId = usize;
-
-const FIRST_REQUEST_ID: RequestId = 1;
-
-const INITIAL_REQUEST_ID: RequestId = FIRST_REQUEST_ID - 1;
-
-fn next_request_id(last_request_id: RequestId) -> RequestId {
-    last_request_id.wrapping_add(1).max(FIRST_REQUEST_ID)
-}
 
 type PortId = usize;
 
@@ -75,7 +70,7 @@ impl ConnectedPorts {
             .map(|PortContext { port, .. }| port)
     }
 
-    fn post_message(&self, id: PortId, msg: &JsValue) -> Result<(), PortError> {
+    fn post_message_js(&self, id: PortId, msg: &JsValue) -> Result<(), PortError> {
         self.ctx_by_id
             .get(&id)
             .ok_or(PortError::NotConnected)
@@ -86,6 +81,27 @@ impl ConnectedPorts {
                 } = ctx;
                 console::debug!("Posting message on port", port, msg);
                 port.post_message(msg);
+            })
+    }
+
+    fn post_message<T: Serialize>(&self, id: PortId, msg: &T) -> Result<(), PortError> {
+        self.ctx_by_id
+            .get(&id)
+            .ok_or(PortError::NotConnected)
+            .map(|ctx| {
+                let PortContext {
+                    port,
+                    last_request_id: _,
+                } = ctx;
+                let msg = match JsValue::from_serde(msg) {
+                    Ok(msg) => msg,
+                    Err(err) => {
+                        console::error!("Failed to serialize message", err.to_string());
+                        return;
+                    }
+                };
+                console::debug!("Posting message on port", port, &msg);
+                port.post_message(&msg);
             })
     }
 
@@ -122,8 +138,12 @@ impl App {
         self.connected_ports.next_request_id(port_id)
     }
 
-    fn post_port_message(&self, port_id: PortId, msg: &JsValue) -> Result<(), PortError> {
+    fn post_port_message<T: Serialize>(&self, port_id: PortId, msg: &T) -> Result<(), PortError> {
         self.connected_ports.post_message(port_id, msg)
+    }
+
+    fn post_port_message_js(&self, port_id: PortId, msg: &JsValue) -> Result<(), PortError> {
+        self.connected_ports.post_message_js(port_id, msg)
     }
 }
 
@@ -165,7 +185,7 @@ pub fn start() {
 fn on_message(app: &Rc<RefCell<App>>, request: JsValue, sender: JsValue, send_response: Function) {
     console::debug!("Received request message", &request, &sender);
     let request_id = app.borrow_mut().next_request_id();
-    if let Some(response) = on_request(request_id, request) {
+    if let Some(response) = on_request(app, request_id, request) {
         let this = JsValue::null();
         if let Err(err) = send_response.call1(&this, &response) {
             console::error!(
@@ -225,8 +245,8 @@ fn on_port_message(app: &Rc<RefCell<App>>, port_id: PortId, request: JsValue) {
             return;
         }
     };
-    if let Some(response) = on_port_request(port_id, request_id, request) {
-        if let Err(err) = app.borrow().post_port_message(port_id, &response) {
+    if let Some(response) = on_port_request(app, port_id, request_id, request) {
+        if let Err(err) = app.borrow().post_port_message_js(port_id, &response) {
             console::warn!(
                 "Failed to post response message to port",
                 port_id,
@@ -237,14 +257,14 @@ fn on_port_message(app: &Rc<RefCell<App>>, port_id: PortId, request: JsValue) {
     }
 }
 
-fn on_request(request_id: RequestId, request: JsValue) -> Option<JsValue> {
+fn on_request(app: &Rc<RefCell<App>>, request_id: RequestId, request: JsValue) -> Option<JsValue> {
     let request = request
         .into_serde()
         .map_err(|err| {
             console::error!("Failed to deserialize request message", &err.to_string());
         })
         .ok()?;
-    let response = handle_request(request_id, request);
+    let response = handle_app_request(app, request_id, request);
     JsValue::from_serde(&response)
         .map_err(|err| {
             console::error!("Failed to serialize response message", &err.to_string());
@@ -252,7 +272,12 @@ fn on_request(request_id: RequestId, request: JsValue) -> Option<JsValue> {
         .ok()
 }
 
-fn on_port_request(port_id: PortId, request_id: RequestId, request: JsValue) -> Option<JsValue> {
+fn on_port_request(
+    app: &Rc<RefCell<App>>,
+    port_id: PortId,
+    request_id: RequestId,
+    request: JsValue,
+) -> Option<JsValue> {
     let request = request
         .into_serde()
         .map_err(|err| {
@@ -262,7 +287,7 @@ fn on_port_request(port_id: PortId, request_id: RequestId, request: JsValue) -> 
             );
         })
         .ok()?;
-    let response = handle_port_request(port_id, request_id, request);
+    let response = handle_port_request(app, port_id, request_id, request);
     JsValue::from_serde(&response)
         .map_err(|err| {
             console::error!(
@@ -278,13 +303,22 @@ fn on_port_request(port_id: PortId, request_id: RequestId, request: JsValue) -> 
 /// Optionally returns a single response.
 ///
 /// TODO: Extract into domain crate
-fn handle_request(_request_id: RequestId, request: Request) -> Option<Response> {
-    match request {
-        Request::GetOptionsInfo => Response::OptionsInfo {
+fn handle_app_request(
+    _app: &Rc<RefCell<App>>,
+    request_id: RequestId,
+    request: AppRequest,
+) -> Option<AppResponse> {
+    let Request { header, payload } = request;
+    let payload: Option<_> = match payload {
+        AppRequestPayload::GetOptionsInfo => AppResponsePayload::OptionsInfo {
             version: VERSION.to_string(),
         }
         .into(),
-    }
+    };
+    payload.map(|payload| Response {
+        header: header.into_response(request_id),
+        payload,
+    })
 }
 
 /// Handle a port-local request.
@@ -293,16 +327,87 @@ fn handle_request(_request_id: RequestId, request: Request) -> Option<Response> 
 ///
 /// TODO: Extract into domain crate
 fn handle_port_request(
-    _port_id: PortId,
-    _request_id: RequestId,
+    app: &Rc<RefCell<App>>,
+    port_id: PortId,
+    request_id: RequestId,
     request: PortRequest,
 ) -> Option<PortResponse> {
-    match request {
-        PortRequest::Ping => PortResponse::Pong.into(),
-        PortRequest::StreamingExample => {
-            PortResponse::StreamingExample(StreamResponse::Accepted).into()
+    let Request { header, payload } = request;
+    let payload: Option<_> = match payload {
+        PortRequestPayload::Ping => PortResponsePayload::Pong.into(),
+        PortRequestPayload::StartStreaming { num_items } => {
+            let started = match num_items {
+                0 => StreamingResponsePayload::Started {
+                    started: StreamingStarted::Rejected {
+                        reason: "no items requested".to_string().into(),
+                    },
+                },
+                10.. => StreamingResponsePayload::Started {
+                    started: StreamingStarted::Rejected {
+                        reason: "too many items requested".to_string().into(),
+                    },
+                },
+                _ => {
+                    wasm_bindgen_futures::spawn_local({
+                        let header = header.clone();
+                        let app = Rc::clone(app);
+                        // TODO: Wrap async the task into a control struct that allows aborting it.
+                        // All pending tasks need be managed depending on the scope, i.e. app or port.
+                        async move {
+                            console::debug!("Start streaming");
+                            let mut last_item_index = None;
+                            for item_index in 0..num_items {
+                                let payload = PortResponsePayload::Streaming(
+                                    StreamingResponsePayload::Item { index: item_index },
+                                );
+                                let response = Response {
+                                    header: header.clone().into_response(request_id),
+                                    payload,
+                                };
+                                console::debug!(
+                                    "Next streaming item response",
+                                    format!("{response:?}")
+                                );
+                                app.borrow().post_port_message(port_id, &response).ok();
+                                last_item_index = Some(item_index);
+                                // Delay the next (or final) response. Without yielding at some point
+                                // the locally spawned task would finish before the started response
+                                // could be posted.
+                                TimeoutFuture::new(1).await;
+                            }
+                            console::debug!("Finish streaming");
+                            let finished = if last_item_index.unwrap_or(num_items) < num_items {
+                                StreamingFinished::Completed
+                            } else {
+                                StreamingFinished::Aborted { reason: None }
+                            };
+                            let payload = PortResponsePayload::Streaming(
+                                StreamingResponsePayload::Finished {
+                                    finished,
+                                    last_item_index,
+                                },
+                            );
+                            let response = Response {
+                                header: header.into_response(request_id),
+                                payload,
+                            };
+                            app.borrow().post_port_message(port_id, &response).ok();
+                        }
+                    });
+                    StreamingResponsePayload::Started {
+                        started: StreamingStarted::Accepted,
+                    }
+                }
+            };
+            PortResponsePayload::Streaming(started).into()
         }
-    }
+    };
+    // The started response might be posted after the first stream item response
+    // or even after the finished response that are all generated asynchronously!
+    payload.map(|payload| Response {
+        header: header.into_response(request_id),
+        payload,
+    })
 }
 
 // https://developer.chrome.com/docs/extensions/reference/scripting/#type-CSSInjection
