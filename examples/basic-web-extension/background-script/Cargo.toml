@@ -9,6 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 gloo-console = "0.2.1"
+gloo-timers = { version = "0.2.4", features = ["futures"] }
 js-sys = "0.3.58"
 messages = { version = "0.0.0", path = "../messages" }
 serde = { version = "1.0.137", features = ["derive"] }
