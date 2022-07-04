@@ -369,7 +369,7 @@ fn handle_port_request(
                                 // Delay the next (or final) response. Without yielding at some point
                                 // the locally spawned task would finish before the started response
                                 // could be posted.
-                                TimeoutFuture::new(1).await;
+                                TimeoutFuture::new(5_000).await;
                             }
                             console::debug!("Finish streaming");
                             let status = if last_item_index.unwrap_or(num_items) < num_items {
