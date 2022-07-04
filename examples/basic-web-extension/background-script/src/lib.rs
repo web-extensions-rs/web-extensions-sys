@@ -6,7 +6,7 @@ use js_sys::{Function, Object};
 use messages::{
     next_request_id, AppRequest, AppRequestPayload, AppResponse, AppResponsePayload, PortRequest,
     PortRequestPayload, PortResponse, PortResponsePayload, Request, RequestId, Response,
-    StreamingFinished, StreamingResponsePayload, StreamingStarted, INITIAL_REQUEST_ID,
+    StreamingFinishedStatus, StreamingResponsePayload, StreamingStartedStatus, INITIAL_REQUEST_ID,
 };
 use serde::Serialize;
 use thiserror::Error;
@@ -336,16 +336,12 @@ fn handle_port_request(
     let payload: Option<_> = match payload {
         PortRequestPayload::Ping => PortResponsePayload::Pong.into(),
         PortRequestPayload::StartStreaming { num_items } => {
-            let started = match num_items {
-                0 => StreamingResponsePayload::Started {
-                    started: StreamingStarted::Rejected {
-                        reason: "no items requested".to_string().into(),
-                    },
+            let status = match num_items {
+                0 => StreamingStartedStatus::Rejected {
+                    reason: "no items requested".to_string().into(),
                 },
-                10.. => StreamingResponsePayload::Started {
-                    started: StreamingStarted::Rejected {
-                        reason: "too many items requested".to_string().into(),
-                    },
+                10.. => StreamingStartedStatus::Rejected {
+                    reason: "too many items requested".to_string().into(),
                 },
                 _ => {
                     wasm_bindgen_futures::spawn_local({
@@ -376,14 +372,14 @@ fn handle_port_request(
                                 TimeoutFuture::new(1).await;
                             }
                             console::debug!("Finish streaming");
-                            let finished = if last_item_index.unwrap_or(num_items) < num_items {
-                                StreamingFinished::Completed
+                            let status = if last_item_index.unwrap_or(num_items) < num_items {
+                                StreamingFinishedStatus::Completed
                             } else {
-                                StreamingFinished::Aborted { reason: None }
+                                StreamingFinishedStatus::Aborted { reason: None }
                             };
                             let payload = PortResponsePayload::Streaming(
                                 StreamingResponsePayload::Finished {
-                                    finished,
+                                    status,
                                     last_item_index,
                                 },
                             );
@@ -394,12 +390,10 @@ fn handle_port_request(
                             app.borrow().post_port_message(port_id, &response).ok();
                         }
                     });
-                    StreamingResponsePayload::Started {
-                        started: StreamingStarted::Accepted,
-                    }
+                    StreamingStartedStatus::Accepted
                 }
             };
-            PortResponsePayload::Streaming(started).into()
+            PortResponsePayload::Streaming(StreamingResponsePayload::Started { status }).into()
         }
     };
     // The started response might be posted after the first stream item response
