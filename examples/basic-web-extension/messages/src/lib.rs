@@ -91,7 +91,7 @@ pub enum PortResponsePayload {
 pub type PortResponse = Response<PortResponsePayload>;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum StreamingStarted {
+pub enum StreamingStartedStatus {
     /// The request has been accepted and will be processed.
     Accepted,
     /// The request has been rejected.
@@ -102,7 +102,7 @@ pub enum StreamingStarted {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum StreamingFinished {
+pub enum StreamingFinishedStatus {
     /// Processing has been completed.
     Completed,
     /// Processing has been aborted prematurely.
@@ -115,7 +115,7 @@ pub enum StreamingFinished {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum StreamingResponsePayload {
     Started {
-        started: StreamingStarted,
+        status: StreamingStartedStatus,
     },
     /// A streaming item.
     ///
@@ -126,7 +126,7 @@ pub enum StreamingResponsePayload {
     },
     /// Request processing has finished.
     Finished {
-        finished: StreamingFinished,
+        status: StreamingFinishedStatus,
         #[serde(skip_serializing_if = "Option::is_none")]
         last_item_index: Option<usize>,
     },
