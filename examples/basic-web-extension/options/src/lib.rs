@@ -1,6 +1,6 @@
 use gloo_console as console;
 use gloo_utils::document;
-use messages::{Request, Response};
+use messages::{AppRequestPayload, AppResponsePayload, Request, Response};
 use wasm_bindgen::prelude::*;
 use web_extensions_sys::chrome;
 
@@ -8,10 +8,11 @@ use web_extensions_sys::chrome;
 pub fn start() {
     console::info!("Start options script");
 
-    let request = JsValue::from_serde(&Request::GetOptionsInfo).unwrap();
+    let payload = AppRequestPayload::GetOptionsInfo;
+    let msg = JsValue::from_serde(&Request::new(payload)).unwrap();
 
     wasm_bindgen_futures::spawn_local(async move {
-        match chrome.runtime().send_message(None, &request, None).await {
+        match chrome.runtime().send_message(None, &msg, None).await {
             Ok(js_value) => {
                 if js_value.is_object() {
                     handle_response(js_value);
@@ -27,7 +28,11 @@ pub fn start() {
 }
 
 fn handle_response(response: JsValue) {
-    if let Ok(Response::OptionsInfo { version }) = response.into_serde() {
+    if let Ok(Response {
+        header: _,
+        payload: AppResponsePayload::OptionsInfo { version },
+    }) = response.into_serde()
+    {
         let container = document().query_selector("#version").unwrap().unwrap();
         container.set_inner_html(&format!("Version: {version}"));
     } else {
