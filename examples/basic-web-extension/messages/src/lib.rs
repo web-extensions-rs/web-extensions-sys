@@ -12,18 +12,18 @@ pub fn next_request_id(last_request_id: RequestId) -> RequestId {
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct RequestHeader {
-    pub client_id: Option<String>,
+    pub client_token: Option<String>,
 }
 
 impl RequestHeader {
     pub const fn new() -> Self {
-        Self { client_id: None }
+        Self { client_token: None }
     }
 
     pub fn into_response(self, request_id: RequestId) -> ResponseHeader {
-        let Self { client_id } = self;
+        let Self { client_token } = self;
         ResponseHeader {
-            client_id,
+            client_token,
             request_id,
         }
     }
@@ -46,7 +46,7 @@ impl<T> Request<T> {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ResponseHeader {
-    pub client_id: Option<String>,
+    pub client_token: Option<String>,
     pub request_id: RequestId,
 }
 
