@@ -5,8 +5,9 @@ use gloo_timers::future::TimeoutFuture;
 use js_sys::{Function, Object};
 use messages::{
     next_request_id, AppRequest, AppRequestPayload, AppResponse, AppResponsePayload, PortRequest,
-    PortRequestPayload, PortResponse, PortResponsePayload, Request, RequestId, Response,
-    StreamingFinishedStatus, StreamingResponsePayload, StreamingStartedStatus, INITIAL_REQUEST_ID,
+    PortRequestPayload, PortResponse, PortResponsePayload, Request, RequestHeader, RequestId,
+    Response, ResponseHeader, StreamingFinishedStatus, StreamingResponsePayload,
+    StreamingStartedStatus, INITIAL_REQUEST_ID,
 };
 use serde::Serialize;
 use thiserror::Error;
@@ -321,6 +322,103 @@ fn handle_app_request(
     })
 }
 
+#[derive(Debug, Clone, Copy)]
+enum StreamingTaskStatus {
+    Pending,
+    Finished,
+}
+
+#[derive(Debug, Error)]
+enum StreamingTaskError {
+    #[error(transparent)]
+    Port(#[from] PortError),
+
+    #[error("not pending")]
+    NotPending,
+}
+
+struct StreamingTask {
+    app: Rc<RefCell<App>>,
+    port_id: PortId,
+    request_id: RequestId,
+    request_header: RequestHeader,
+    last_item_index: Option<usize>,
+    status: StreamingTaskStatus,
+}
+
+impl StreamingTask {
+    fn new(
+        app: Rc<RefCell<App>>,
+        port_id: PortId,
+        request_id: RequestId,
+        request_header: RequestHeader,
+    ) -> Self {
+        Self {
+            app,
+            port_id,
+            request_id,
+            request_header,
+            last_item_index: None,
+            status: StreamingTaskStatus::Pending,
+        }
+    }
+
+    fn status(&self) -> StreamingTaskStatus {
+        self.status
+    }
+
+    fn last_item_index(&self) -> Option<usize> {
+        self.last_item_index
+    }
+
+    fn new_response_header(&self) -> ResponseHeader {
+        self.request_header.clone().into_response(self.request_id)
+    }
+
+    fn next_item(&mut self /*empty item data*/) -> Result<usize, StreamingTaskError> {
+        if !matches!(self.status, StreamingTaskStatus::Pending) {
+            return Err(StreamingTaskError::NotPending);
+        }
+        let next_item_index = self.last_item_index.unwrap_or(0);
+        let payload = PortResponsePayload::Streaming(StreamingResponsePayload::Item {
+            index: next_item_index,
+        });
+        let response = Response {
+            header: self.new_response_header(),
+            payload,
+        };
+        console::debug!("Next streaming item response", format!("{response:?}"));
+        self.app
+            .borrow()
+            .post_port_message(self.port_id, &response)?;
+        self.last_item_index = Some(next_item_index);
+        Ok(next_item_index)
+    }
+
+    fn abort(&mut self, reason: Option<String>) -> Result<(), StreamingTaskError> {
+        self.finish(StreamingFinishedStatus::Aborted { reason })
+    }
+
+    fn finish(&mut self, status: StreamingFinishedStatus) -> Result<(), StreamingTaskError> {
+        if !matches!(self.status, StreamingTaskStatus::Pending) {
+            return Err(StreamingTaskError::NotPending);
+        }
+        let payload = PortResponsePayload::Streaming(StreamingResponsePayload::Finished {
+            status,
+            last_item_index: self.last_item_index,
+        });
+        let response = Response {
+            header: self.new_response_header(),
+            payload,
+        };
+        self.app
+            .borrow()
+            .post_port_message(self.port_id, &response)?;
+        self.status = StreamingTaskStatus::Finished;
+        Ok(())
+    }
+}
+
 /// Handle a port-local request.
 ///
 /// Optionally returns a single response.
@@ -344,50 +442,55 @@ fn handle_port_request(
                     reason: "too many items requested".to_string().into(),
                 },
                 _ => {
+                    let task =
+                        StreamingTask::new(Rc::clone(app), port_id, request_id, header.clone());
+                    let task = Rc::new(RefCell::new(task));
                     wasm_bindgen_futures::spawn_local({
-                        let header = header.clone();
-                        let app = Rc::clone(app);
-                        // TODO: Wrap async the task into a control struct that allows aborting it.
-                        // All pending tasks need be managed depending on the scope, i.e. app or port.
+                        let task = Rc::clone(&task);
                         async move {
                             console::debug!("Start streaming");
-                            let mut last_item_index = None;
                             for item_index in 0..num_items {
-                                let payload = PortResponsePayload::Streaming(
-                                    StreamingResponsePayload::Item { index: item_index },
-                                );
-                                let response = Response {
-                                    header: header.clone().into_response(request_id),
-                                    payload,
-                                };
-                                console::debug!(
-                                    "Next streaming item response",
-                                    format!("{response:?}")
-                                );
-                                app.borrow().post_port_message(port_id, &response).ok();
-                                last_item_index = Some(item_index);
+                                if let Err(err) = task.borrow_mut().next_item() {
+                                    if matches!(err, StreamingTaskError::NotPending) {
+                                        console::info!("Streaming task has been aborted prematurely before item index", item_index);
+                                    } else {
+                                        console::warn!(
+                                            "Streaming task failed for item index",
+                                            item_index,
+                                            err.to_string()
+                                        );
+                                    }
+                                    return;
+                                }
                                 // Delay the next (or final) response. Without yielding at some point
                                 // the locally spawned task would finish before the started response
                                 // could be posted.
                                 TimeoutFuture::new(5_000).await;
                             }
                             console::debug!("Finish streaming");
-                            let status = if last_item_index.unwrap_or(num_items) < num_items {
-                                StreamingFinishedStatus::Completed
-                            } else {
-                                StreamingFinishedStatus::Aborted { reason: None }
-                            };
-                            let payload = PortResponsePayload::Streaming(
-                                StreamingResponsePayload::Finished {
-                                    status,
-                                    last_item_index,
-                                },
-                            );
-                            let response = Response {
-                                header: header.into_response(request_id),
-                                payload,
-                            };
-                            app.borrow().post_port_message(port_id, &response).ok();
+                            task.borrow_mut()
+                                .finish(StreamingFinishedStatus::Completed)
+                                .unwrap();
+                        }
+                    });
+                    wasm_bindgen_futures::spawn_local({
+                        let task = Rc::clone(&task);
+                        async move {
+                            // Try to abort the task after 20 secs elapsed
+                            TimeoutFuture::new(20_000).await;
+                            if let Err(err) = task
+                                .borrow_mut()
+                                .abort("timeout expired".to_string().into())
+                            {
+                                if matches!(err, StreamingTaskError::NotPending) {
+                                    console::info!("Streaming task has already finished and does not need to be aborted");
+                                } else {
+                                    console::warn!(
+                                        "Failed to abort streaming task",
+                                        err.to_string()
+                                    );
+                                }
+                            }
                         }
                     });
                     StreamingStartedStatus::Accepted
