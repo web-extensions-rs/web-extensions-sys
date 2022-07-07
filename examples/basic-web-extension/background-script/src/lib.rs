@@ -453,14 +453,14 @@ fn handle_port_request(
                         let task = Rc::clone(&task);
                         async move {
                             console::debug!("Start streaming");
-                            for item_index in 0..num_items {
+                            for item_count in 1..=num_items {
                                 if let Err(err) = task.borrow_mut().next_item() {
                                     if matches!(err, StreamingTaskError::NotPending) {
-                                        console::info!("Streaming task has been aborted prematurely before item index", item_index);
+                                        console::info!("Streaming task has been aborted prematurely before item", item_count);
                                     } else {
                                         console::warn!(
-                                            "Streaming task failed for item index",
-                                            item_index,
+                                            "Streaming task failed for item",
+                                            item_count,
                                             err.to_string()
                                         );
                                     }
