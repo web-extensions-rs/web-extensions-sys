@@ -119,15 +119,26 @@ pub enum StreamingResponsePayload {
     },
     /// A streaming item.
     ///
-    /// Items are sequentially numbered by a 0-based index
-    /// and might be received out of order.
+    /// The `item_count` serves as a 1-based index for (re-)ordering
+    /// received item messages. Depending on the dispatching strategy
+    /// messages might arrive out of order and receivers should account
+    /// for that.
     Item {
-        index: usize,
+        item_count: usize,
     },
     /// Request processing has finished.
     Finished {
         status: StreamingFinishedStatus,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        last_item_index: Option<usize>,
+
+        /// The total item count.
+        ///
+        /// Denotes the total number of item messages that have been sent.
+        /// After the finished message has been sent no more item messages
+        /// will be sent.
+        ///
+        /// In-flight item messages that have already been sent but have
+        /// not yet been received might arrive later and out of order depending
+        /// on the dispatching strategy.
+        item_count: usize,
     },
 }
