@@ -335,6 +335,9 @@ enum StreamingTaskError {
 
     #[error("not pending")]
     NotPending,
+
+    #[error("item count overflow")]
+    ItemCountOverflow,
 }
 
 struct StreamingTask {
@@ -342,7 +345,7 @@ struct StreamingTask {
     port_id: PortId,
     request_id: RequestId,
     request_header: RequestHeader,
-    last_item_index: Option<usize>,
+    item_count: usize,
     status: StreamingTaskStatus,
 }
 
@@ -358,7 +361,7 @@ impl StreamingTask {
             port_id,
             request_id,
             request_header,
-            last_item_index: None,
+            item_count: 0,
             status: StreamingTaskStatus::Pending,
         }
     }
@@ -367,8 +370,8 @@ impl StreamingTask {
         self.status
     }
 
-    fn last_item_index(&self) -> Option<usize> {
-        self.last_item_index
+    fn item_count(&self) -> usize {
+        self.item_count
     }
 
     fn new_response_header(&self) -> ResponseHeader {
@@ -379,10 +382,11 @@ impl StreamingTask {
         if !matches!(self.status, StreamingTaskStatus::Pending) {
             return Err(StreamingTaskError::NotPending);
         }
-        let next_item_index = self.last_item_index.unwrap_or(0);
-        let payload = PortResponsePayload::Streaming(StreamingResponsePayload::Item {
-            index: next_item_index,
-        });
+        let item_count = self
+            .item_count
+            .checked_add(1)
+            .ok_or(StreamingTaskError::ItemCountOverflow)?;
+        let payload = PortResponsePayload::Streaming(StreamingResponsePayload::Item { item_count });
         let response = Response {
             header: self.new_response_header(),
             payload,
@@ -391,8 +395,8 @@ impl StreamingTask {
         self.app
             .borrow()
             .post_port_message(self.port_id, &response)?;
-        self.last_item_index = Some(next_item_index);
-        Ok(next_item_index)
+        self.item_count = item_count;
+        Ok(item_count)
     }
 
     fn abort(&mut self, reason: Option<String>) -> Result<(), StreamingTaskError> {
@@ -405,7 +409,7 @@ impl StreamingTask {
         }
         let payload = PortResponsePayload::Streaming(StreamingResponsePayload::Finished {
             status,
-            last_item_index: self.last_item_index,
+            item_count: self.item_count,
         });
         let response = Response {
             header: self.new_response_header(),
