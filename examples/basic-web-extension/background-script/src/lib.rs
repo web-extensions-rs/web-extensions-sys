@@ -212,7 +212,6 @@ fn on_tab_changed(tab_id: i32, change_info: TabChangeInfo, tab: Tab) {
 }
 
 fn on_connect_port(app: &Rc<RefCell<App>>, port: Port) {
-    // FIXME: How to notice a disconnection?
     console::info!("Connecting new port", &port);
     let port_id = if let Some(port_id) = app.borrow_mut().connect_port(port.clone()) {
         port_id
@@ -228,6 +227,18 @@ fn on_connect_port(app: &Rc<RefCell<App>>, port: Port) {
     };
     let closure: Closure<dyn Fn(JsValue)> = Closure::new(on_message);
     port.on_message()
+        .add_listener(closure.as_ref().unchecked_ref());
+    closure.forget();
+
+    let on_disconnect = {
+        let app = Rc::clone(app);
+        move || {
+            console::log!(format!("Port {port_id} has disconnected"));
+            app.borrow_mut().disconnect_port(port_id);
+        }
+    };
+    let closure: Closure<dyn Fn()> = Closure::new(on_disconnect);
+    port.on_disconnect()
         .add_listener(closure.as_ref().unchecked_ref());
     closure.forget();
 }
@@ -364,14 +375,6 @@ impl StreamingTask {
             item_count: 0,
             status: StreamingTaskStatus::Pending,
         }
-    }
-
-    fn status(&self) -> StreamingTaskStatus {
-        self.status
-    }
-
-    fn item_count(&self) -> usize {
-        self.item_count
     }
 
     fn new_response_header(&self) -> ResponseHeader {
