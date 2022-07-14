@@ -22,4 +22,7 @@ extern "C" {
 
     #[wasm_bindgen(method, getter, js_name = onConnect)]
     pub fn on_connect(this: &Runtime) -> EventTarget;
+
+    #[wasm_bindgen(method, js_name = openOptionsPage)]
+    pub fn open_options_page(this: &Runtime);
 }
