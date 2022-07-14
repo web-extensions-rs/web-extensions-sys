@@ -558,7 +558,7 @@ async fn inject_frontend(tab_id: TabId) {
     console::info!("Inject CSS", &css_injection);
     if let Err(err) = chrome
         .scripting()
-        .insert_css(Object::from(css_injection))
+        .insert_css(&Object::from(css_injection))
         .await
     {
         console::info!("Unable to inject CSS", err);
@@ -578,7 +578,7 @@ async fn inject_frontend(tab_id: TabId) {
 
     if let Err(err) = chrome
         .scripting()
-        .execute_script(Object::from(script_injection))
+        .execute_script(&Object::from(script_injection))
         .await
     {
         console::info!("Unable to inject JS", err);
