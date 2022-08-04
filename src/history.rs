@@ -8,7 +8,7 @@ extern "C" {
     pub type History;
 
     #[wasm_bindgen(method)]
-    async fn search(this: &History, query: &Object) -> JsValue;
+    pub async fn search(this: &History, query: &Object) -> JsValue;
 }
 
 #[wasm_bindgen]
