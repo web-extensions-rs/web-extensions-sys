@@ -8,7 +8,7 @@ extern "C" {
     pub type Bookmarks;
 
     #[wasm_bindgen(method)]
-    async fn search(this: &Bookmarks, query: &JsValue) -> JsValue;
+    pub async fn search(this: &Bookmarks, query: &JsValue) -> JsValue;
 }
 
 #[wasm_bindgen]
