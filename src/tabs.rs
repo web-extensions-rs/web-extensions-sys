@@ -397,3 +397,17 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &TabChangeInfo) -> Option<String>;
 }
+
+#[wasm_bindgen]
+extern "C" {
+    #[derive(Debug)]
+    pub type TabHighlightInfo;
+
+    // All highlighted tabs in the window.
+    #[wasm_bindgen(method, getter, js_name = tabIds)]
+    pub fn tab_ids(this: &TabHighlightInfo) -> JsValue;
+
+    // The window whose tabs changed.
+    #[wasm_bindgen(method, getter, js_name = windowId)]
+    pub fn window_id(this: &TabHighlightInfo) -> i32;
+}
