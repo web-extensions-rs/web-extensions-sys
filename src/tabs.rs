@@ -411,3 +411,21 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = windowId)]
     pub fn window_id(this: &TabHighlightInfo) -> i32;
 }
+
+#[wasm_bindgen]
+extern "C" {
+    #[derive(Debug)]
+    pub type TabZoomChangeInfo;
+
+    #[wasm_bindgen(method, getter, js_name = newZoomFactor)]
+    pub fn new_zoom_factor(this: &TabZoomChangeInfo) -> f64;
+
+    #[wasm_bindgen(method, getter, js_name = oldZoomFactor)]
+    pub fn old_zoom_factor(this: &TabZoomChangeInfo) -> f64;
+
+    #[wasm_bindgen(method, getter, js_name = tabId)]
+    pub fn tab_id(this: &TabZoomChangeInfo) -> i32;
+
+    #[wasm_bindgen(method, getter, js_name = zoomSettings)]
+    pub fn zoom_settings(this: &TabZoomChangeInfo) -> JsValue;
+}
