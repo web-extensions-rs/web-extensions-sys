@@ -38,6 +38,9 @@ extern "C" {
     #[wasm_bindgen(extends = StorageAreaWrite)]
     pub type Local;
 
+    #[wasm_bindgen(extends = StorageAreaWrite)]
+    pub type SessionStorage;
+
     #[wasm_bindgen(extends = StorageAreaRead)]
     pub type Managed;
 }
@@ -51,6 +54,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn local(this: &Storage) -> Local;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn session(this: &Storage) -> SessionStorage;
 
     #[wasm_bindgen(method, getter)]
     pub fn managed(this: &Storage) -> Managed;
