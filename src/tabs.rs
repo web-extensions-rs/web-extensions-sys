@@ -2,19 +2,24 @@ use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
+// `TAB_ID_NONE` has value `-1` so we have to use i32
+type TabId = i32;
+
+type WindowId = i32; // TODO: is i32 correct?
+
 #[wasm_bindgen]
 extern "C" {
     #[derive(Debug)]
     pub type TabActiveInfo;
 
     #[wasm_bindgen(method, getter, js_name = previousTabId)]
-    pub fn previous_tab_id(this: &TabActiveInfo) -> Option<i32>;
+    pub fn previous_tab_id(this: &TabActiveInfo) -> Option<TabId>;
 
     #[wasm_bindgen(method, getter, js_name = tabId)]
-    pub fn tab_id(this: &TabActiveInfo) -> i32;
+    pub fn tab_id(this: &TabActiveInfo) -> TabId;
 
     #[wasm_bindgen(method, getter, js_name = windowId)]
-    pub fn window_id(this: &TabActiveInfo) -> i32;
+    pub fn window_id(this: &TabActiveInfo) -> WindowId;
 }
 
 #[wasm_bindgen]
@@ -23,7 +28,7 @@ extern "C" {
     pub type TabDetachInfo;
 
     #[wasm_bindgen(method, getter, js_name = oldWindowId)]
-    pub fn old_window_id(this: &TabDetachInfo) -> i32;
+    pub fn old_window_id(this: &TabDetachInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = oldPosition)]
     pub fn old_position(this: &TabDetachInfo) -> u32;
@@ -35,7 +40,7 @@ extern "C" {
     pub type TabAttachInfo;
 
     #[wasm_bindgen(method, getter, js_name = newWindowId)]
-    pub fn new_window_id(this: &TabAttachInfo) -> i32;
+    pub fn new_window_id(this: &TabAttachInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = newPosition)]
     pub fn new_position(this: &TabAttachInfo) -> u32;
@@ -47,7 +52,7 @@ extern "C" {
     pub type TabMoveInfo;
 
     #[wasm_bindgen(method, getter, js_name = windowId)]
-    pub fn window_id(this: &TabMoveInfo) -> i32;
+    pub fn window_id(this: &TabMoveInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = fromIndex)]
     pub fn from_index(this: &TabMoveInfo) -> u32;
@@ -62,7 +67,7 @@ extern "C" {
     pub type TabRemoveInfo;
 
     #[wasm_bindgen(method, getter, js_name = windowId)]
-    pub fn window_id(this: &TabRemoveInfo) -> i32;
+    pub fn window_id(this: &TabRemoveInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = isWindowClosing)]
     pub fn is_window_closing(this: &TabRemoveInfo) -> bool;
@@ -141,11 +146,11 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     // TODO is i32 correct ?
-    pub fn id(this: &Tab) -> Option<i32>;
+    pub fn id(this: &Tab) -> Option<TabId>;
 
     #[wasm_bindgen(method, getter, js_name = openerTabId)]
     // TODO is i32 correct ?
-    pub fn opener_tab_id(this: &Tab) -> Option<i32>;
+    pub fn opener_tab_id(this: &Tab) -> Option<TabId>;
 
     #[wasm_bindgen(method, getter, js_name = successorId)]
     // TODO is i32 correct ?
@@ -170,7 +175,7 @@ extern "C" {
     pub fn url(this: &Tab) -> Option<String>;
 
     #[wasm_bindgen(method, getter, js_name = windowId)]
-    pub fn window_id(this: &Tab) -> i32;
+    pub fn window_id(this: &Tab) -> WindowId;
 }
 
 #[wasm_bindgen]
@@ -178,26 +183,26 @@ extern "C" {
     pub type Tabs;
 
     #[wasm_bindgen(method, getter, js_name = TAB_ID_NONE)]
-    pub fn tab_id_none(this: &Tabs) -> i32;
+    pub fn tab_id_none(this: &Tabs) -> TabId;
 
     #[wasm_bindgen(catch, method, js_name = captureTab)]
     pub async fn capture_tab(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = captureVisibleTab)]
     pub async fn capture_visible_tab(
         this: &Tabs,
-        window_id: Option<i32>,
+        window_id: Option<WindowId>,
         info: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn connect(
         this: &Tabs,
-        tab_id: i32,
+        tab_id: TabId,
         info: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
 
@@ -208,26 +213,26 @@ extern "C" {
     pub async fn discard(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn duplicate(this: &Tabs, tab_id: i32) -> Result<JsValue, JsValue>;
+    pub async fn duplicate(this: &Tabs, tab_id: TabId) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = executeScript)]
     pub async fn execute_script(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: &Object,
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn get(this: &Tabs, tab_id: i32) -> Result<JsValue, JsValue>;
+    pub async fn get(this: &Tabs, tab_id: TabId) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = getCurrent)]
     pub async fn get_current(this: &Tabs) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = getZoom)]
-    pub async fn get_zoom(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
+    pub async fn get_zoom(this: &Tabs, tab_id: Option<TabId>) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = getZoomSettings)]
-    pub async fn get_zoom_settings(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
+    pub async fn get_zoom_settings(this: &Tabs, tab_id: Option<TabId>) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn hide(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
@@ -238,7 +243,7 @@ extern "C" {
     #[wasm_bindgen(catch, method, js_name = insertCSS)]
     pub async fn insert_css(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: &Object,
     ) -> Result<JsValue, JsValue>;
 
@@ -249,7 +254,7 @@ extern "C" {
     pub async fn move_in_succession(
         this: &Tabs,
         tab_ids: &JsValue,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
 
@@ -265,7 +270,7 @@ extern "C" {
     #[wasm_bindgen(catch, method)]
     pub async fn reload(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
 
@@ -275,7 +280,7 @@ extern "C" {
     #[wasm_bindgen(catch, method, js_name = removeCSS)]
     pub async fn remove_css(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: &Object,
     ) -> Result<JsValue, JsValue>;
 
@@ -285,7 +290,7 @@ extern "C" {
     #[wasm_bindgen(catch, method, js_name = sendMessage)]
     pub async fn send_message(
         this: &Tabs,
-        tab_id: i32,
+        tab_id: TabId,
         message: &JsValue,
         info: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
@@ -293,14 +298,14 @@ extern "C" {
     #[wasm_bindgen(catch, method, js_name = setZoom)]
     pub async fn set_zoom(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         zoom_factor: f64,
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = setZoomSettings)]
     pub async fn set_zoom_settings(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: &Object,
     ) -> Result<JsValue, JsValue>;
 
@@ -308,17 +313,17 @@ extern "C" {
     pub async fn show(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = toggleReaderMode)]
-    pub async fn toggle_reader_mode(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
+    pub async fn toggle_reader_mode(this: &Tabs, tab_id: Option<TabId>) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn update(
         this: &Tabs,
-        tab_id: Option<i32>,
+        tab_id: Option<TabId>,
         info: &Object,
     ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = detectLanguage)]
-    pub async fn detect_language(this: &Tabs, tab_id: Option<i32>) -> Result<JsValue, JsValue>;
+    pub async fn detect_language(this: &Tabs, tab_id: Option<TabId>) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onActivated)]
     pub fn on_activated(this: &Tabs) -> EventTarget;
@@ -409,7 +414,7 @@ extern "C" {
 
     // The window whose tabs changed.
     #[wasm_bindgen(method, getter, js_name = windowId)]
-    pub fn window_id(this: &TabHighlightInfo) -> i32;
+    pub fn window_id(this: &TabHighlightInfo) -> WindowId;
 }
 
 #[wasm_bindgen]
@@ -424,7 +429,7 @@ extern "C" {
     pub fn old_zoom_factor(this: &TabZoomChangeInfo) -> f64;
 
     #[wasm_bindgen(method, getter, js_name = tabId)]
-    pub fn tab_id(this: &TabZoomChangeInfo) -> i32;
+    pub fn tab_id(this: &TabZoomChangeInfo) -> TabId;
 
     #[wasm_bindgen(method, getter, js_name = zoomSettings)]
     pub fn zoom_settings(this: &TabZoomChangeInfo) -> JsValue;
