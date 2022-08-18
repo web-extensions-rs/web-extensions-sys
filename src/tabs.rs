@@ -2,10 +2,19 @@ use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
-// `TAB_ID_NONE` has value `-1` so we have to use i32
-type TabId = i32;
+/// The tab's ID.
+///
+/// Tab IDs are unique within a browser session.
+type TabId = i32; // `TAB_ID_NONE` has value `-1` so we have to use i32
 
-type WindowId = i32; // TODO: is i32 correct?
+/// The ID of the window that hosts a tab.
+type WindowId = i32;
+
+/// The ID of the group that the tab belongs to.
+type GroupId = i32;
+
+/// Zero-based index of the tab within its window.
+type TabIndex = u32;
 
 #[wasm_bindgen]
 extern "C" {
@@ -31,7 +40,7 @@ extern "C" {
     pub fn old_window_id(this: &TabDetachInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = oldPosition)]
-    pub fn old_position(this: &TabDetachInfo) -> u32;
+    pub fn old_position(this: &TabDetachInfo) -> TabIndex;
 }
 
 #[wasm_bindgen]
@@ -43,7 +52,7 @@ extern "C" {
     pub fn new_window_id(this: &TabAttachInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = newPosition)]
-    pub fn new_position(this: &TabAttachInfo) -> u32;
+    pub fn new_position(this: &TabAttachInfo) -> TabIndex;
 }
 
 #[wasm_bindgen]
@@ -55,10 +64,10 @@ extern "C" {
     pub fn window_id(this: &TabMoveInfo) -> WindowId;
 
     #[wasm_bindgen(method, getter, js_name = fromIndex)]
-    pub fn from_index(this: &TabMoveInfo) -> u32;
+    pub fn from_index(this: &TabMoveInfo) -> TabIndex;
 
     #[wasm_bindgen(method, getter, js_name = toIndex)]
-    pub fn to_index(this: &TabMoveInfo) -> u32;
+    pub fn to_index(this: &TabMoveInfo) -> TabIndex;
 }
 
 #[wasm_bindgen]
@@ -137,27 +146,22 @@ extern "C" {
     pub fn fav_icon_url(this: &Tab) -> Option<String>;
 
     #[wasm_bindgen(method, getter)]
-    // TODO is u32 correct ?
     pub fn width(this: &Tab) -> Option<u32>;
 
     #[wasm_bindgen(method, getter)]
-    // TODO is u32 correct ?
     pub fn height(this: &Tab) -> Option<u32>;
 
     #[wasm_bindgen(method, getter)]
-    // TODO is i32 correct ?
     pub fn id(this: &Tab) -> Option<TabId>;
 
     #[wasm_bindgen(method, getter, js_name = openerTabId)]
-    // TODO is i32 correct ?
     pub fn opener_tab_id(this: &Tab) -> Option<TabId>;
 
     #[wasm_bindgen(method, getter, js_name = successorId)]
-    // TODO is i32 correct ?
-    pub fn successor_id(this: &Tab) -> Option<i32>;
+    pub fn successor_id(this: &Tab) -> Option<TabId>;
 
     #[wasm_bindgen(method, getter)]
-    pub fn index(this: &Tab) -> u32;
+    pub fn index(this: &Tab) -> TabIndex;
 
     #[wasm_bindgen(method, getter, js_name = mutedInfo)]
     pub fn muted_info(this: &Tab) -> TabMutedInfo;
@@ -380,7 +384,7 @@ extern "C" {
 
     // The tab's new group.
     #[wasm_bindgen(method, getter, js_name = groupId)]
-    pub fn group_id(this: &TabChangeInfo) -> Option<i32>; // TODO: is i32 correct?
+    pub fn group_id(this: &TabChangeInfo) -> Option<GroupId>;
 
     // The tab's new muted state and the reason for the change.
     #[wasm_bindgen(method, getter, js_name = mutedInfo)]
