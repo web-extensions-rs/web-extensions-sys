@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## v0.3.0 (2022-08-18)
 
 - Remove deprecated `tabs.executeScript` function
 - Add `SessionStorageo`
