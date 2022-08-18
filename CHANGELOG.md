@@ -1,5 +1,12 @@
 # Changelog
 
+## unreleased
+
+- Remove deprecated `tabs.executeScript` function
+- Add `SessionStorageo`
+- Add `TabHighlightInfo type`
+- Add `ZoomChangeInfo type`
+
 ## v0.2.0 (2022-08-04)
 
 - Add basic web extension example (Manifest V3)
