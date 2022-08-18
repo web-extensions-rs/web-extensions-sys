@@ -1,3 +1,5 @@
+// https://developer.chrome.com/docs/extensions/reference/tabs/
+
 use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
@@ -18,6 +20,7 @@ type TabIndex = u32;
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onActivated-callback-activeInfo
     #[derive(Debug)]
     pub type TabActiveInfo;
 
@@ -33,6 +36,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onDetached-callback-detachInfo
     #[derive(Debug)]
     pub type TabDetachInfo;
 
@@ -45,6 +49,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onAttached-callback-attachInfo
     #[derive(Debug)]
     pub type TabAttachInfo;
 
@@ -57,6 +62,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onMoved-callback-moveInfo
     #[derive(Debug)]
     pub type TabMoveInfo;
 
@@ -72,6 +78,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onRemoved-callback-removeInfo
     #[derive(Debug)]
     pub type TabRemoveInfo;
 
@@ -100,6 +107,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-Tab
     #[derive(Debug, Clone)]
     pub type Tab;
 
@@ -184,6 +192,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#method
     pub type Tabs;
 
     #[wasm_bindgen(method, getter, js_name = TAB_ID_NONE)]
@@ -409,6 +418,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onHighlighted-callback-highlightInfo
     #[derive(Debug)]
     pub type TabHighlightInfo;
 
@@ -423,6 +433,7 @@ extern "C" {
 
 #[wasm_bindgen]
 extern "C" {
+    // https://developer.chrome.com/docs/extensions/reference/tabs/#type-onZoomChange-callback-ZoomChangeInfo
     #[derive(Debug)]
     pub type TabZoomChangeInfo;
 
