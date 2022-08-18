@@ -228,13 +228,6 @@ extern "C" {
     #[wasm_bindgen(catch, method)]
     pub async fn duplicate(this: &Tabs, tab_id: TabId) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(catch, method, js_name = executeScript)]
-    pub async fn execute_script(
-        this: &Tabs,
-        tab_id: Option<TabId>,
-        info: &Object,
-    ) -> Result<JsValue, JsValue>;
-
     #[wasm_bindgen(catch, method)]
     pub async fn get(this: &Tabs, tab_id: TabId) -> Result<JsValue, JsValue>;
 
