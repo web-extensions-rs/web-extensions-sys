@@ -2,7 +2,6 @@ use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
-#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type ContextualIdentities;
@@ -11,16 +10,26 @@ extern "C" {
     pub async fn create(this: &ContextualIdentities, details: &Object) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn get(this: &ContextualIdentities, cookie_store_id: &str) -> Result<JsValue, JsValue>;
+    pub async fn get(
+        this: &ContextualIdentities,
+        cookie_store_id: &str,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn query(this: &ContextualIdentities, details: &Object) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn update(this: &ContextualIdentities, cookie_store_id: &str, details: &Object) -> Result<JsValue, JsValue>;
+    pub async fn update(
+        this: &ContextualIdentities,
+        cookie_store_id: &str,
+        details: &Object,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
-    pub async fn remove(this: &ContextualIdentities, cookie_store_id: &str) -> Result<JsValue, JsValue>;
+    pub async fn remove(
+        this: &ContextualIdentities,
+        cookie_store_id: &str,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, getter, js_name = onCreated)]
     pub fn on_created(this: &ContextualIdentities) -> EventTarget;

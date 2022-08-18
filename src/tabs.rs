@@ -326,7 +326,8 @@ extern "C" {
     pub async fn show(this: &Tabs, tab_ids: &JsValue) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method, js_name = toggleReaderMode)]
-    pub async fn toggle_reader_mode(this: &Tabs, tab_id: Option<TabId>) -> Result<JsValue, JsValue>;
+    pub async fn toggle_reader_mode(this: &Tabs, tab_id: Option<TabId>)
+        -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn update(
