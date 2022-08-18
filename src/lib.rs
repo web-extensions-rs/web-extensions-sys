@@ -38,7 +38,7 @@ pub use theme::*;
 pub use windows::*;
 
 pub mod traits {
-    pub use crate::storage::{StorageAreaRead, StorageArea};
+    pub use crate::storage::{StorageArea, StorageAreaRead};
 }
 
 #[wasm_bindgen]

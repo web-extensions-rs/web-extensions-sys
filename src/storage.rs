@@ -2,19 +2,20 @@ use crate::EventTarget;
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
 
-#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     pub type StorageAreaRead;
 
     #[wasm_bindgen(catch, method, js_name = "getBytesInUse")]
-    pub async fn get_bytes_in_use(this: &StorageAreaRead, keys: &JsValue) -> Result<JsValue, JsValue>;
+    pub async fn get_bytes_in_use(
+        this: &StorageAreaRead,
+        keys: &JsValue,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(catch, method)]
     pub async fn get(this: &StorageAreaRead, keys: &JsValue) -> Result<JsValue, JsValue>;
 }
 
-#[rustfmt::skip] // rustfmt removes `async` blocks
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(extends = StorageAreaRead)]
