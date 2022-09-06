@@ -3,6 +3,7 @@
 use js_sys::Function;
 use wasm_bindgen::prelude::*;
 
+mod action;
 mod bookmarks;
 mod browser_action;
 mod commands;
@@ -20,6 +21,7 @@ mod tabs;
 mod theme;
 mod windows;
 
+pub use action::*;
 pub use bookmarks::*;
 pub use browser_action::*;
 pub use commands::*;
@@ -50,6 +52,9 @@ extern "C" {
 
     // This is used for Google Chrome Extensions
     pub static chrome: Browser;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn action(this: &Browser) -> Action;
 
     #[wasm_bindgen(method, getter, js_name = browserAction)]
     pub fn browser_action(this: &Browser) -> BrowserAction;
