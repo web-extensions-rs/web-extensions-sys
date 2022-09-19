@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.1 (2022-09-19)
+
+- Add `Action::on_clicked`
+
 ## v0.3.0 (2022-08-18)
 
 - Remove deprecated `tabs.executeScript` function
