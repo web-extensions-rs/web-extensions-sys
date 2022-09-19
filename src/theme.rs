@@ -48,7 +48,7 @@ impl Color {
 
     fn as_u8(value: JsValue) -> Option<u8> {
         let float = value.as_f64()?;
-        if float.fract() == 0.0 && float >= 0.0 && float <= 255.0 {
+        if float.fract() == 0.0 && (0.0..=255.0).contains(&float) {
             Some(float as u8)
         } else {
             None
