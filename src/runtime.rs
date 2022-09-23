@@ -23,6 +23,14 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = onConnect)]
     pub fn on_connect(this: &Runtime) -> EventTarget;
 
+    #[wasm_bindgen(method, getter, js_name = onInstalled)]
+    pub fn on_installed(this: &Runtime) -> EventTarget;
+
+    #[wasm_bindgen(method, js_name = setUninstallURL)]
+    pub fn set_uninstall_url(this: &Runtime, url: &str);
+
     #[wasm_bindgen(method, js_name = openOptionsPage)]
     pub fn open_options_page(this: &Runtime);
+
+
 }
