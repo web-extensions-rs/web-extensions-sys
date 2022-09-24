@@ -20,6 +20,13 @@ extern "C" {
         details: &JsValue,
     ) -> Result<JsValue, JsValue>;
 
+    #[wasm_bindgen(method, catch, js_name = launchWebAuthFlow)]
+    pub fn launch_webauth_flow_with_callback(
+        this: &Identity,
+        details: &JsValue,
+        callback: &Function,
+    ) -> Result<(), JsValue>;
+
     #[wasm_bindgen(method, catch, js_name = getAuthToken)]
     pub fn get_auth_token(this: &Identity) -> Result<(), JsValue>;
 

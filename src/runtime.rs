@@ -32,5 +32,4 @@ extern "C" {
     #[wasm_bindgen(method, js_name = openOptionsPage)]
     pub fn open_options_page(this: &Runtime);
 
-
 }
