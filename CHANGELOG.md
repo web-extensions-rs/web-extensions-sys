@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.2 (2022-10-18)
+
+- Add `Runtime::last_error`
+- Add `Runtime::on_installed`
+- Add `Runtime::set_uninstall_url`
+- Add `Identity::launch_webauth_flow_with_callback`
+
 ## v0.3.1 (2022-09-19)
 
 - Add `Action::on_clicked`
