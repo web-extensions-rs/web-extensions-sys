@@ -32,4 +32,6 @@ extern "C" {
     #[wasm_bindgen(method, js_name = openOptionsPage)]
     pub fn open_options_page(this: &Runtime);
 
+    #[wasm_bindgen(method, getter, js_name = lastError)]
+    pub fn last_error(this: &Runtime) -> Option<js_sys::Error>;
 }
