@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.3 (2022-10-26)
+
+- Add `Bookmarks::get`
+
 ## v0.3.2 (2022-10-18)
 
 - Add `Runtime::last_error`
