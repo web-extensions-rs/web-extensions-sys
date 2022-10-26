@@ -1,6 +1,6 @@
 [package]
 name = "web-extensions-sys"
-version = "0.3.2"
+version = "0.3.3"
 authors = [
   "Roman Volosatovs <rvolosatovs@riseup.net>",
   "Pauan <pcxunlimited@gmail.com>",
