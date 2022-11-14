@@ -115,9 +115,6 @@ extern "C" {
     pub fn active(this: &Tab) -> bool;
 
     #[wasm_bindgen(method, getter)]
-    pub fn hidden(this: &Tab) -> bool;
-
-    #[wasm_bindgen(method, getter)]
     pub fn incognito(this: &Tab) -> bool;
 
     #[wasm_bindgen(method, getter)]
@@ -153,6 +150,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = favIconUrl)]
     pub fn fav_icon_url(this: &Tab) -> Option<String>;
 
+    #[wasm_bindgen(method, getter, js_name = groupId)]
+    pub fn group_id(this: &Tab) -> Option<GroupId>;
+
     #[wasm_bindgen(method, getter)]
     pub fn width(this: &Tab) -> Option<u32>;
 
@@ -164,6 +164,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter, js_name = openerTabId)]
     pub fn opener_tab_id(this: &Tab) -> Option<TabId>;
+
+    #[wasm_bindgen(method, getter, js_name = pendingUrl)]
+    pub fn pending_url(this: &Tab) -> Option<String>;
 
     #[wasm_bindgen(method, getter, js_name = successorId)]
     pub fn successor_id(this: &Tab) -> Option<TabId>;
