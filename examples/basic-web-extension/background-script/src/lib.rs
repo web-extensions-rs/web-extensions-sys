@@ -2,6 +2,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use gloo_console as console;
 use gloo_timers::future::TimeoutFuture;
+use gloo_utils::format::JsValueSerdeExt;
 use js_sys::{Function, Object};
 use messages::{
     next_request_id, AppRequest, AppRequestPayload, AppResponse, AppResponsePayload, PortRequest,

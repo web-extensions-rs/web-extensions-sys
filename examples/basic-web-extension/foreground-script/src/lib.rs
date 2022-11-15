@@ -1,4 +1,5 @@
 use gloo_console as console;
+use gloo_utils::format::JsValueSerdeExt;
 use gloo_utils::{body, document};
 use wasm_bindgen::{prelude::*, JsCast};
 use web_extensions_sys::{chrome, Port};

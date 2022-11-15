@@ -8,12 +8,13 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
-gloo-console = "0.2.1"
+gloo-console = "0.2.3"
 gloo-timers = { version = "0.2.4", features = ["futures"] }
-js-sys = "0.3.58"
+gloo-utils = "0.1.5"
+js-sys = "0.3.60"
 messages = { version = "0.0.0", path = "../messages" }
-serde = { version = "1.0.137", features = ["derive"] }
-thiserror = "1.0.31"
-wasm-bindgen = { version = "0.2.81", features = ["serde-serialize"] }
-wasm-bindgen-futures = "0.4.31"
-web-extensions-sys = "0.1.0"
+serde = { version = "1.0.147", features = ["derive"] }
+thiserror = "1.0.37"
+wasm-bindgen = "0.2.83"
+wasm-bindgen-futures = "0.4.33"
+web-extensions-sys = "0.3.3"
