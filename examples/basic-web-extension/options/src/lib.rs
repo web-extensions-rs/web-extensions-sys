@@ -13,7 +13,7 @@ pub fn start() {
     let msg = JsValue::from_serde(&Request::new(payload)).unwrap();
 
     wasm_bindgen_futures::spawn_local(async move {
-        match chrome.runtime().send_message(None, &msg, None).await {
+        match chrome().runtime().send_message(None, &msg, None).await {
             Ok(js_value) => {
                 if js_value.is_object() {
                     handle_response(js_value);
