@@ -1,5 +1,6 @@
 use gloo_console as console;
 use gloo_utils::document;
+use gloo_utils::format::JsValueSerdeExt;
 use messages::{AppRequestPayload, AppResponsePayload, Request, Response};
 use wasm_bindgen::prelude::*;
 use web_extensions_sys::chrome;
