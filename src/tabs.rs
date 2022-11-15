@@ -115,52 +115,57 @@ extern "C" {
     pub fn active(this: &Tab) -> bool;
 
     #[wasm_bindgen(method, getter)]
-    pub fn incognito(this: &Tab) -> bool;
-
-    #[wasm_bindgen(method, getter)]
-    pub fn pinned(this: &Tab) -> bool;
-
-    #[wasm_bindgen(method, getter)]
-    pub fn highlighted(this: &Tab) -> bool;
-
-    #[wasm_bindgen(method, getter, js_name = isArticle)]
-    pub fn is_article(this: &Tab) -> bool;
-
-    #[wasm_bindgen(method, getter, js_name = isInReaderMode)]
-    pub fn is_in_reader_mode(this: &Tab) -> bool;
-
-    #[wasm_bindgen(method, getter, js_name = lastAccessed)]
-    pub fn last_accessed(this: &Tab) -> f64;
-
-    #[wasm_bindgen(method, getter)]
-    pub fn attention(this: &Tab) -> Option<bool>;
-
-    #[wasm_bindgen(method, getter)]
     pub fn audible(this: &Tab) -> Option<bool>;
 
-    #[wasm_bindgen(method, getter)]
-    pub fn discarded(this: &Tab) -> Option<bool>;
+    #[cfg(not(feature = "firefox"))]
+    #[wasm_bindgen(method, getter, js_name = autoDiscardable)]
+    pub fn auto_discardable(this: &Tab) -> bool;
 
+    #[cfg(feature = "firefox")]
     #[wasm_bindgen(method, getter, js_name = autoDiscardable)]
     pub fn auto_discardable(this: &Tab) -> Option<bool>;
 
-    #[wasm_bindgen(method, getter, js_name = cookieStoreId)]
-    pub fn cookie_store_id(this: &Tab) -> Option<String>;
+    #[cfg(not(feature = "firefox"))]
+    #[wasm_bindgen(method, getter)]
+    pub fn discarded(this: &Tab) -> bool;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter)]
+    pub fn discarded(this: &Tab) -> Option<bool>;
 
     #[wasm_bindgen(method, getter, js_name = favIconUrl)]
     pub fn fav_icon_url(this: &Tab) -> Option<String>;
 
+    #[cfg(not(feature = "firefox"))]
+    #[wasm_bindgen(method, getter, js_name = groupId)]
+    pub fn group_id(this: &Tab) -> GroupId;
+
+    #[cfg(feature = "firefox")]
     #[wasm_bindgen(method, getter, js_name = groupId)]
     pub fn group_id(this: &Tab) -> Option<GroupId>;
-
-    #[wasm_bindgen(method, getter)]
-    pub fn width(this: &Tab) -> Option<u32>;
 
     #[wasm_bindgen(method, getter)]
     pub fn height(this: &Tab) -> Option<u32>;
 
     #[wasm_bindgen(method, getter)]
+    pub fn highlighted(this: &Tab) -> bool;
+
+    #[wasm_bindgen(method, getter)]
     pub fn id(this: &Tab) -> Option<TabId>;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn incognito(this: &Tab) -> bool;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn index(this: &Tab) -> TabIndex;
+
+    #[cfg(not(feature = "firefox"))]
+    #[wasm_bindgen(method, getter, js_name = mutedInfo)]
+    pub fn muted_info(this: &Tab) -> Option<TabMutedInfo>;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter, js_name = mutedInfo)]
+    pub fn muted_info(this: &Tab) -> TabMutedInfo;
 
     #[wasm_bindgen(method, getter, js_name = openerTabId)]
     pub fn opener_tab_id(this: &Tab) -> Option<TabId>;
@@ -168,14 +173,8 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = pendingUrl)]
     pub fn pending_url(this: &Tab) -> Option<String>;
 
-    #[wasm_bindgen(method, getter, js_name = successorId)]
-    pub fn successor_id(this: &Tab) -> Option<TabId>;
-
     #[wasm_bindgen(method, getter)]
-    pub fn index(this: &Tab) -> TabIndex;
-
-    #[wasm_bindgen(method, getter, js_name = mutedInfo)]
-    pub fn muted_info(this: &Tab) -> TabMutedInfo;
+    pub fn pinned(this: &Tab) -> bool;
 
     #[wasm_bindgen(method, getter, js_name = sessionId)]
     pub fn session_id(this: &Tab) -> Option<String>;
@@ -189,8 +188,42 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &Tab) -> Option<String>;
 
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &Tab) -> Option<u32>;
+
     #[wasm_bindgen(method, getter, js_name = windowId)]
     pub fn window_id(this: &Tab) -> WindowId;
+
+    // --- Firefox only --- //
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter)]
+    pub fn attention(this: &Tab) -> Option<bool>;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter, js_name = cookieStoreId)]
+    pub fn cookie_store_id(this: &Tab) -> Option<String>;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter)]
+    pub fn hidden(this: &Tab) -> bool;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter, js_name = isArticle)]
+    pub fn is_article(this: &Tab) -> bool;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter, js_name = isInReaderMode)]
+    pub fn is_in_reader_mode(this: &Tab) -> bool;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter, js_name = lastAccessed)]
+    pub fn last_accessed(this: &Tab) -> f64;
+
+    #[cfg(feature = "firefox")]
+    #[wasm_bindgen(method, getter, js_name = successorId)]
+    pub fn successor_id(this: &Tab) -> Option<TabId>;
+
 }
 
 #[wasm_bindgen]
