@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use js_sys::Function;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{JsStatic, prelude::*};
 
 mod action;
 mod bookmarks;
@@ -51,17 +51,29 @@ pub mod traits {
     pub use crate::storage::{StorageArea, StorageAreaRead};
 }
 
+#[cfg(feature = "firefox")]
+pub fn browser() ->  &'static JsStatic<Browser> {
+    &BROWSER
+}
+
+#[cfg(not(feature = "firefox"))]
+pub fn chrome() ->  &'static JsStatic<Browser> {
+    &CHROME
+}
+
 #[wasm_bindgen]
 extern "C" {
     pub type Browser;
 
     // This is used for Mozilla Firefox Addons
     #[cfg(feature = "firefox")]
-    pub static browser: Browser;
+    #[wasm_bindgen(js_name = browser)]
+    static BROWSER: Browser;
 
-    #[cfg(not(feature = "firefox"))]
     // This is used for Google Chrome Extensions
-    pub static chrome: Browser;
+    #[cfg(not(feature = "firefox"))]
+    #[wasm_bindgen(js_name = chrome)]
+    static CHROME: Browser;
 
     #[wasm_bindgen(method, getter)]
     pub fn action(this: &Browser) -> Action;

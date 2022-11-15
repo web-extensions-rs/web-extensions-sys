@@ -160,14 +160,14 @@ pub fn start() {
         move |request, sender, send_response| on_message(&app, request, sender, send_response)
     };
     let closure: Closure<dyn Fn(JsValue, JsValue, Function)> = Closure::new(on_message);
-    chrome
+    chrome()
         .runtime()
         .on_message()
         .add_listener(closure.as_ref().unchecked_ref());
     closure.forget();
 
     let closure: Closure<dyn Fn(TabId, TabChangeInfo, Tab)> = Closure::new(on_tab_changed);
-    chrome
+    chrome()
         .tabs()
         .on_updated()
         .add_listener(closure.as_ref().unchecked_ref());
@@ -177,7 +177,7 @@ pub fn start() {
         on_connect_port(&app, port);
     };
     let closure: Closure<dyn Fn(Port)> = Closure::new(on_connect);
-    chrome
+    chrome()
         .runtime()
         .on_connect()
         .add_listener(closure.as_ref().unchecked_ref());
@@ -557,7 +557,7 @@ async fn inject_frontend(tab_id: TabId) {
     })
     .unwrap();
     console::info!("Inject CSS", &css_injection);
-    if let Err(err) = chrome
+    if let Err(err) = chrome()
         .scripting()
         .insert_css(&Object::from(css_injection))
         .await
@@ -577,7 +577,7 @@ async fn inject_frontend(tab_id: TabId) {
     })
     .unwrap();
 
-    if let Err(err) = chrome
+    if let Err(err) = chrome()
         .scripting()
         .execute_script(&Object::from(script_injection))
         .await

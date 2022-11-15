@@ -46,7 +46,7 @@ fn render_container() {
 
 fn connect() -> Port {
     let connect_info = JsValue::null();
-    chrome
+    chrome()
         .runtime()
         .connect(None, connect_info.as_ref().unchecked_ref())
 }
