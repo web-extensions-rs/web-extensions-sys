@@ -5,8 +5,10 @@ use wasm_bindgen::prelude::*;
 
 mod action;
 mod bookmarks;
+#[cfg(feature = "firefox")]
 mod browser_action;
 mod commands;
+#[cfg(feature = "firefox")]
 mod contextual_identities;
 mod downloads;
 mod history;
@@ -15,16 +17,20 @@ mod port;
 mod runtime;
 mod scripting;
 mod sessions;
+#[cfg(feature = "firefox")]
 mod sidebar_action;
 mod storage;
 mod tabs;
+#[cfg(feature = "firefox")]
 mod theme;
 mod windows;
 
 pub use action::*;
 pub use bookmarks::*;
+#[cfg(feature = "firefox")]
 pub use browser_action::*;
 pub use commands::*;
+#[cfg(feature = "firefox")]
 pub use contextual_identities::*;
 pub use downloads::*;
 pub use history::*;
@@ -33,9 +39,11 @@ pub use port::*;
 pub use runtime::*;
 pub use scripting::*;
 pub use sessions::*;
+#[cfg(feature = "firefox")]
 pub use sidebar_action::*;
 pub use storage::*;
 pub use tabs::*;
+#[cfg(feature = "firefox")]
 pub use theme::*;
 pub use windows::*;
 
@@ -48,17 +56,21 @@ extern "C" {
     pub type Browser;
 
     // This is used for Mozilla Firefox Addons
+    #[cfg(feature = "firefox")]
     pub static browser: Browser;
 
+    #[cfg(not(feature = "firefox"))]
     // This is used for Google Chrome Extensions
     pub static chrome: Browser;
 
     #[wasm_bindgen(method, getter)]
     pub fn action(this: &Browser) -> Action;
 
+    #[cfg(feature = "firefox")]
     #[wasm_bindgen(method, getter, js_name = browserAction)]
     pub fn browser_action(this: &Browser) -> BrowserAction;
 
+    #[cfg(feature = "firefox")]
     #[wasm_bindgen(method, getter, js_name = contextualIdentities)]
     pub fn contextual_identities(this: &Browser) -> ContextualIdentities;
 
@@ -71,6 +83,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn sessions(this: &Browser) -> Sessions;
 
+    #[cfg(feature = "firefox")]
     #[wasm_bindgen(method, getter, js_name = sidebarAction)]
     pub fn sidebar_action(this: &Browser) -> SidebarAction;
 
@@ -80,7 +93,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tabs(this: &Browser) -> Tabs;
 
-    // This is only supported in Firefox
+    #[cfg(feature = "firefox")]
     #[wasm_bindgen(method, getter)]
     pub fn theme(this: &Browser) -> BrowserTheme;
 

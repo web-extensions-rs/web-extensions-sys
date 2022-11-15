@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Remove Firefox support (experimental fallback: use `firefox` feature)
+
 ## v0.3.3 (2022-10-26)
 
 - Add `Bookmarks::get`
