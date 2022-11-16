@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## v0.4.0 (2022-11-16)
 
+- Use public function `chrome` to access the API.
 - Remove Firefox support (experimental fallback: use `firefox` feature)
 
 ## v0.3.3 (2022-10-26)
