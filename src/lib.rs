@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 use js_sys::Function;
-use wasm_bindgen::{JsStatic, prelude::*};
+use wasm_bindgen::{prelude::*, JsStatic};
 
 mod action;
 mod bookmarks;
@@ -13,6 +13,7 @@ mod contextual_identities;
 mod downloads;
 mod history;
 mod identity;
+mod omnibox;
 mod port;
 mod runtime;
 mod scripting;
@@ -35,6 +36,7 @@ pub use contextual_identities::*;
 pub use downloads::*;
 pub use history::*;
 pub use identity::*;
+pub use omnibox::*;
 pub use port::*;
 pub use runtime::*;
 pub use scripting::*;
@@ -52,12 +54,12 @@ pub mod traits {
 }
 
 #[cfg(feature = "firefox")]
-pub fn browser() ->  &'static JsStatic<Browser> {
+pub fn browser() -> &'static JsStatic<Browser> {
     &BROWSER
 }
 
 #[cfg(not(feature = "firefox"))]
-pub fn chrome() ->  &'static JsStatic<Browser> {
+pub fn chrome() -> &'static JsStatic<Browser> {
     &CHROME
 }
 
@@ -126,6 +128,9 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     pub fn identity(this: &Browser) -> Identity;
+
+    #[wasm_bindgen(method, getter)]
+    pub fn omnibox(this: &Browser) -> Omnibox;
 }
 
 #[wasm_bindgen]
