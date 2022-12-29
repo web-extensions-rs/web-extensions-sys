@@ -14,6 +14,13 @@ extern "C" {
         options: Option<&Object>,
     ) -> Result<JsValue, JsValue>;
 
+    #[wasm_bindgen(catch, method, js_name = sendNativeMessage)]
+    pub async fn send_native_message(
+        this: &Runtime,
+        application: &str,
+        message: &Object,
+    ) -> Result<JsValue, JsValue>;
+
     #[wasm_bindgen(method)]
     pub fn connect(this: &Runtime, extension_id: Option<&str>, connect_info: &Object) -> Port;
 
