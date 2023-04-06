@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.1 (2023-04-07)
+
+- Add `Identity::get_profile_user_info`
+
 ## v0.4.0 (2022-11-16)
 
 - Use public function `chrome` to access the API.

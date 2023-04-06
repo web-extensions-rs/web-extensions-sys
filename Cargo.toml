@@ -1,6 +1,6 @@
 [package]
 name = "web-extensions-sys"
-version = "0.4.0"
+version = "0.4.1"
 authors = [
   "Roman Volosatovs <rvolosatovs@riseup.net>",
   "Pauan <pcxunlimited@gmail.com>",
@@ -18,9 +18,9 @@ categories = ["external-ffi-bindings", "wasm"]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-js-sys = "0.3.60"
-wasm-bindgen = "0.2.83"
-wasm-bindgen-futures = "0.4.33"
+js-sys = "0.3.61"
+wasm-bindgen = "0.2.84"
+wasm-bindgen-futures = "0.4.34"
 
 [features]
 default = []
