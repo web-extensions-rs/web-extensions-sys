@@ -39,4 +39,11 @@ extern "C" {
         details: &JsValue,
         callback: &Function,
     ) -> Result<(), JsValue>;
+
+    // https://developer.chrome.com/docs/extensions/reference/identity/#method-getProfileUserInfo
+    #[wasm_bindgen(method, catch, js_name = getProfileUserInfo)]
+    pub async fn get_profile_user_info(
+        this: &Identity,
+        details: &JsValue,
+    ) -> Result<JsValue, JsValue>;
 }
