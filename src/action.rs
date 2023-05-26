@@ -13,4 +13,8 @@ extern "C" {
     // https://developer.chrome.com/docs/extensions/reference/action/#method-openPopup
     #[wasm_bindgen(catch, method, js_name = openPopup)]
     pub async fn open_popup(this: &Action, options: &JsValue) -> Result<JsValue, JsValue>;
+
+    // https://developer.chrome.com/docs/extensions/reference/action/#method-setPopup
+    #[wasm_bindgen(catch, method, js_name = setPopup)]
+    pub async fn set_popup(this: &Action, details: &JsValue) -> Result<JsValue, JsValue>;
 }
