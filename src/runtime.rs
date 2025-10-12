@@ -24,6 +24,9 @@ extern "C" {
     #[wasm_bindgen(method)]
     pub fn connect(this: &Runtime, extension_id: Option<&str>, connect_info: &Object) -> Port;
 
+    #[wasm_bindgen(method, js_name = connectNative)]
+    pub fn connect_native(this: &Runtime, application: &str) -> Port;
+
     #[wasm_bindgen(method, getter, js_name = onMessage)]
     pub fn on_message(this: &Runtime) -> EventTarget;
 
